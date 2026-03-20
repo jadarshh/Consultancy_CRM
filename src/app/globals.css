@@ -1,0 +1,381 @@
+@import "tailwindcss";
+
+/* ─── EduFlow Design System — "Deep Ocean" Theme ──────────────────────────── */
+
+:root {
+  /* Brand Colors */
+  --primary: #1E3A5F;
+  --primary-light: #2A4A72;
+  --primary-dark: #152C47;
+  --primary-50: #EEF4FF;
+  --primary-100: #D8E8FF;
+  --accent: #4A90D9;
+  --accent-warm: #E8913A;
+
+  /* Neutrals */
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+  --border: #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  /* Text */
+  --text-primary: #1A202C;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  /* Semantic */
+  --success: #16A34A;
+  --success-bg: #F0FDF4;
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
+  --info: #2563EB;
+  --info-bg: #EFF6FF;
+
+  /* Sidebar */
+  --sidebar-bg: #1E3A5F;
+  --sidebar-hover: rgba(255,255,255,0.08);
+  --sidebar-active: rgba(255,255,255,0.15);
+  --sidebar-text: rgba(255,255,255,0.85);
+  --sidebar-text-muted: rgba(255,255,255,0.5);
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.04);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--text-primary);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-accent: var(--accent);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ─── Base Styles ─────────────────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Scrollbars ──────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Sidebar ─────────────────────────────────────────────────────────────── */
+
+.sidebar {
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+}
+
+.sidebar-link {
+  color: var(--sidebar-text);
+  transition: background 150ms ease, color 150ms ease;
+  border-radius: 8px;
+}
+
+.sidebar-link:hover {
+  background: var(--sidebar-hover);
+  color: #FFFFFF;
+}
+
+.sidebar-link.active {
+  background: var(--sidebar-active);
+  color: #FFFFFF;
+}
+
+/* ─── Cards ───────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-hover {
+  transition: box-shadow 150ms ease, transform 150ms ease;
+}
+
+.card-hover:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* ─── Badges ──────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.badge-primary { background: var(--primary-50); color: var(--primary); }
+.badge-success { background: var(--success-bg); color: var(--success); }
+.badge-warning { background: var(--warning-bg); color: var(--warning); }
+.badge-danger  { background: var(--danger-bg);  color: var(--danger); }
+.badge-info    { background: var(--info-bg);     color: var(--info); }
+.badge-neutral { background: #F1F5F9; color: var(--text-secondary); }
+
+/* ─── Inputs ──────────────────────────────────────────────────────────────── */
+
+.input-base {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  padding: 8px 12px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  width: 100%;
+  outline: none;
+}
+
+.input-base:hover {
+  border-color: var(--border-strong);
+}
+
+.input-base:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.15);
+}
+
+.input-base::placeholder {
+  color: var(--text-muted);
+}
+
+/* ─── Buttons ─────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: none;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #FFFFFF;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.3);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--background);
+  border-color: var(--border-strong);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #FFFFFF;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #B91C1C;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+/* ─── Tables ──────────────────────────────────────────────────────────────── */
+
+.table-base {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-base th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table-base td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.table-base tbody tr:hover {
+  background: #F8FAFC;
+}
+
+.table-base tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ─── Stage Colors ────────────────────────────────────────────────────────── */
+
+.stage-new-inquiry         { background: #F1F5F9; color: #475569; }
+.stage-initial-consultation { background: #EFF6FF; color: #1D4ED8; }
+.stage-profile-assessment  { background: #F5F3FF; color: #6D28D9; }
+.stage-country-shortlisted { background: #ECFDF5; color: #059669; }
+.stage-documents-collection { background: #FFFBEB; color: #B45309; }
+.stage-application-prep    { background: #FFF7ED; color: #C2410C; }
+.stage-applications-submitted { background: #EFF6FF; color: #2563EB; }
+.stage-offer-received      { background: #F0FDF4; color: #16A34A; }
+.stage-offer-accepted      { background: #DCFCE7; color: #15803D; }
+.stage-visa-applied        { background: #FDF4FF; color: #7C3AED; }
+.stage-visa-approved       { background: #ECFDF5; color: #059669; }
+.stage-enrolled            { background: #DCFCE7; color: #15803D; }
+.stage-on-hold             { background: #FEF9C3; color: #854D0E; }
+.stage-withdrawn           { background: #FEF2F2; color: #DC2626; }
+.stage-visa-refused        { background: #FEF2F2; color: #B91C1C; }
+
+/* ─── Priority Colors ─────────────────────────────────────────────────────── */
+
+.priority-low    { background: #F1F5F9; color: #64748B; }
+.priority-medium { background: #FFFBEB; color: #B45309; }
+.priority-high   { background: #FFF7ED; color: #C2410C; }
+.priority-urgent { background: #FEF2F2; color: #DC2626; }
+
+/* ─── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-10px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+.animate-fade-in { animation: fadeIn 200ms ease forwards; }
+.animate-slide-in { animation: slideIn 200ms ease forwards; }
+.animate-pulse-soft { animation: pulse-soft 2s ease infinite; }
+
+/* ─── Kanban ──────────────────────────────────────────────────────────────── */
+
+.kanban-column {
+  background: #F1F5F9;
+  border-radius: 12px;
+  min-width: 260px;
+  max-width: 280px;
+  flex-shrink: 0;
+}
+
+.kanban-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: grab;
+  transition: box-shadow 150ms ease;
+}
+
+.kanban-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+/* ─── Document Checklist ──────────────────────────────────────────────────── */
+
+.doc-item-verified { border-left: 3px solid var(--success); }
+.doc-item-pending  { border-left: 3px solid var(--warning); }
+.doc-item-missing  { border-left: 3px solid var(--danger); }
+.doc-item-expired  { border-left: 3px solid var(--text-muted); }
+
+/* ─── Utility ─────────────────────────────────────────────────────────────── */
+
+.truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+}

@@ -1,0 +1,815 @@
+// EduFlow — Education Consultancy Management System
+// Prisma Schema — Full Data Model
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  COUNSELOR
+  RECEPTIONIST
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+}
+
+enum FundingSource {
+  SELF
+  FAMILY
+  SCHOLARSHIP
+  LOAN
+  MIXED
+}
+
+enum StudyLevel {
+  DIPLOMA
+  BACHELORS
+  MASTERS
+  PHD
+  CERTIFICATE
+  PATHWAY
+  FOUNDATION
+}
+
+enum StudentPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum LeadSource {
+  WALK_IN
+  PHONE
+  WEBSITE
+  REFERRAL
+  SOCIAL_MEDIA
+  EVENT
+  AGENT
+  OTHER
+}
+
+enum StudentStage {
+  NEW_INQUIRY
+  INITIAL_CONSULTATION
+  PROFILE_ASSESSMENT
+  COUNTRY_SHORTLISTED
+  DOCUMENTS_COLLECTION
+  APPLICATION_PREP
+  APPLICATIONS_SUBMITTED
+  OFFER_RECEIVED
+  OFFER_ACCEPTED
+  TUITION_DEPOSITED
+  VISA_DOCUMENTS_PREP
+  VISA_APPLIED
+  VISA_APPROVED
+  PRE_DEPARTURE
+  DEPARTED
+  ENROLLED
+  ON_HOLD
+  WITHDRAWN
+  VISA_REFUSED
+  NOT_QUALIFIED
+}
+
+enum AcademicLevel {
+  SECONDARY
+  HIGHER_SECONDARY
+  BACHELORS
+  MASTERS
+  PHD
+  DIPLOMA
+  CERTIFICATE
+  OTHER
+}
+
+enum GradeType {
+  GPA
+  CGPA
+  PERCENTAGE
+  GRADE
+  OTHER
+}
+
+enum TestType {
+  IELTS
+  TOEFL
+  PTE
+  DUOLINGO
+  GRE
+  GMAT
+  SAT
+  ACT
+  OTHER
+}
+
+enum FamilyRelationship {
+  FATHER
+  MOTHER
+  SPOUSE
+  SIBLING
+  GUARDIAN
+  OTHER
+}
+
+enum DocumentType {
+  PASSPORT
+  PASSPORT_PHOTO
+  NATIONAL_ID
+  BIRTH_CERTIFICATE
+  ACADEMIC_TRANSCRIPT_SECONDARY
+  ACADEMIC_TRANSCRIPT_HIGHER_SECONDARY
+  ACADEMIC_TRANSCRIPT_BACHELORS
+  ACADEMIC_TRANSCRIPT_MASTERS
+  DEGREE_CERTIFICATE
+  PROVISIONAL_CERTIFICATE
+  IELTS_SCORECARD
+  TOEFL_SCORECARD
+  PTE_SCORECARD
+  DUOLINGO_SCORECARD
+  GRE_SCORECARD
+  GMAT_SCORECARD
+  SAT_SCORECARD
+  CV_RESUME
+  SOP
+  LOR_1
+  LOR_2
+  LOR_3
+  BANK_STATEMENT
+  INCOME_TAX_RETURN
+  SPONSORSHIP_LETTER
+  AFFIDAVIT_OF_SUPPORT
+  PROPERTY_DOCUMENTS
+  FIXED_DEPOSIT_RECEIPT
+  MEDICAL_CERTIFICATE
+  POLICE_CLEARANCE
+  VISA_COPY
+  OFFER_LETTER
+  COE
+  CAS
+  I20
+  TRAVEL_INSURANCE
+  FLIGHT_TICKET
+  WORK_EXPERIENCE_LETTER
+  GAP_CERTIFICATE
+  OTHER
+}
+
+enum DocumentStatus {
+  PENDING_REVIEW
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+enum CommunicationType {
+  PHONE_CALL
+  WHATSAPP
+  EMAIL
+  SMS
+  IN_PERSON
+  VIDEO_CALL
+  OTHER
+}
+
+enum CommunicationDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum CallOutcome {
+  CONNECTED
+  NO_ANSWER
+  VOICEMAIL
+  BUSY
+  CALLBACK_REQUESTED
+  OTHER
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ApplicationStatus {
+  DRAFT
+  DOCUMENTS_PENDING
+  READY_TO_SUBMIT
+  SUBMITTED
+  UNDER_REVIEW
+  CONDITIONAL_OFFER
+  UNCONDITIONAL_OFFER
+  OFFER_ACCEPTED
+  OFFER_DECLINED
+  TUITION_DEPOSIT_PAID
+  CAS_REQUESTED
+  CAS_RECEIVED
+  COE_REQUESTED
+  COE_RECEIVED
+  I20_REQUESTED
+  I20_RECEIVED
+  VISA_DOCUMENTS_READY
+  VISA_APPLIED
+  VISA_INTERVIEW_SCHEDULED
+  VISA_APPROVED
+  VISA_REFUSED
+  ENROLLED
+  DEFERRED
+  WITHDRAWN
+  REJECTED
+}
+
+enum UniversityType {
+  PUBLIC
+  PRIVATE
+  COMMUNITY_COLLEGE
+  INSTITUTE
+  LANGUAGE_SCHOOL
+}
+
+enum DeliveryMode {
+  ON_CAMPUS
+  ONLINE
+  HYBRID
+}
+
+enum RequirementType {
+  IELTS_OVERALL
+  IELTS_MIN_BAND
+  TOEFL_OVERALL
+  PTE_OVERALL
+  DUOLINGO_OVERALL
+  GRE_OVERALL
+  GMAT_OVERALL
+  GPA_MINIMUM
+  PERCENTAGE_MINIMUM
+  WORK_EXPERIENCE_YEARS
+  BACKLOGS_MAXIMUM
+  SPECIFIC_SUBJECT
+  OTHER
+}
+
+// ─── User / Staff ────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  firstName    String    @map("first_name")
+  lastName     String    @map("last_name")
+  phone        String?
+  avatarUrl    String?   @map("avatar_url")
+  role         UserRole  @default(COUNSELOR)
+  isActive     Boolean   @default(true) @map("is_active")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  assignedStudents   Student[]            @relation("AssignedCounselor")
+  assignedByStudents Student[]            @relation("AssignedBy")
+  createdStudents    Student[]            @relation("CreatedBy")
+  verifiedDocuments  StudentDocument[]    @relation("VerifiedBy")
+  uploadedDocuments  StudentDocument[]    @relation("UploadedBy")
+  communicationLogs  CommunicationLog[]
+  notes              Note[]
+  assignedTasks      Task[]               @relation("TaskAssignee")
+  createdTasks       Task[]               @relation("TaskCreator")
+  applicationChanges ApplicationHistory[]
+  activityLogs       ActivityLog[]
+
+  @@map("users")
+}
+
+// ─── Student (Central Entity) ────────────────────────────────────────────────
+
+model Student {
+  id              String         @id @default(cuid())
+  referenceNumber String         @unique @map("reference_number")
+
+  // Personal
+  firstName      String         @map("first_name")
+  middleName     String?        @map("middle_name")
+  lastName       String         @map("last_name")
+  dateOfBirth    DateTime?      @map("date_of_birth")
+  gender         Gender?
+  nationality    String?
+  maritalStatus  MaritalStatus? @map("marital_status")
+  religion       String?
+  nativeLanguage String?        @map("native_language")
+  photoUrl       String?        @map("photo_url")
+
+  // Contact
+  email          String
+  phonePrimary   String  @map("phone_primary")
+  phoneSecondary String? @map("phone_secondary")
+  whatsappNumber String? @map("whatsapp_number")
+
+  // Current Address
+  currentAddress    String? @map("current_address")
+  currentCity       String? @map("current_city")
+  currentState      String? @map("current_state")
+  currentCountry    String? @map("current_country")
+  currentPostalCode String? @map("current_postal_code")
+
+  // Permanent Address
+  permanentAddress    String? @map("permanent_address")
+  permanentCity       String? @map("permanent_city")
+  permanentState      String? @map("permanent_state")
+  permanentCountry    String? @map("permanent_country")
+  permanentPostalCode String? @map("permanent_postal_code")
+
+  // Passport
+  passportNumber      String?   @map("passport_number")
+  passportIssueDate   DateTime? @map("passport_issue_date")
+  passportExpiryDate  DateTime? @map("passport_expiry_date")
+  passportIssuePlace  String?   @map("passport_issue_place")
+  hasPreviousVisa     Boolean   @default(false) @map("has_previous_visa")
+  previousVisaDetails Json?     @map("previous_visa_details")
+  visaRefusalHistory  Boolean   @default(false) @map("visa_refusal_history")
+  visaRefusalDetails  String?   @map("visa_refusal_details")
+
+  // Financial
+  fundingSource       FundingSource? @map("funding_source")
+  annualFamilyIncome  Decimal?       @map("annual_family_income")
+  incomeCurrency      String         @default("USD") @map("income_currency")
+  bankBalance         Decimal?       @map("bank_balance")
+  hasEducationLoan    Boolean        @default(false) @map("has_education_loan")
+  loanAmount          Decimal?       @map("loan_amount")
+  sponsorName         String?        @map("sponsor_name")
+  sponsorRelationship String?        @map("sponsor_relationship")
+  sponsorOccupation   String?        @map("sponsor_occupation")
+  sponsorAnnualIncome Decimal?       @map("sponsor_annual_income")
+
+  // Preferences
+  preferredCountries String[]    @map("preferred_countries")
+  preferredIntake    String?     @map("preferred_intake")
+  preferredLevel     StudyLevel? @map("preferred_level")
+  preferredField     String?     @map("preferred_field")
+  budgetMin          Decimal?    @map("budget_min")
+  budgetMax          Decimal?    @map("budget_max")
+  budgetCurrency     String      @default("USD") @map("budget_currency")
+
+  // Health
+  hasHealthIssues   Boolean @default(false) @map("has_health_issues")
+  healthDetails     String? @map("health_details")
+  disabilityDetails String? @map("disability_details")
+
+  // Emergency Contact
+  emergencyName         String? @map("emergency_name")
+  emergencyPhone        String? @map("emergency_phone")
+  emergencyRelationship String? @map("emergency_relationship")
+
+  // Pipeline
+  stage        StudentStage    @default(NEW_INQUIRY)
+  priority     StudentPriority @default(MEDIUM)
+  source       LeadSource      @default(WALK_IN)
+  sourceDetail String?         @map("source_detail")
+
+  // Assignment
+  assignedCounselorId String? @map("assigned_counselor_id")
+  assignedById        String? @map("assigned_by_id")
+  createdById         String  @map("created_by_id")
+
+  // Meta
+  tags      String[]
+  notes     String?
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  assignedCounselor User?              @relation("AssignedCounselor", fields: [assignedCounselorId], references: [id])
+  assignedBy        User?              @relation("AssignedBy", fields: [assignedById], references: [id])
+  createdBy         User               @relation("CreatedBy", fields: [createdById], references: [id])
+  academicRecords   AcademicRecord[]
+  testScores        TestScore[]
+  workExperiences   WorkExperience[]
+  familyMembers     FamilyMember[]
+  documents         StudentDocument[]
+  communicationLogs CommunicationLog[]
+  studentNotes      Note[]
+  tasks             Task[]
+  applications      Application[]
+
+  @@map("students")
+}
+
+// ─── Academic Records ─────────────────────────────────────────────────────────
+
+model AcademicRecord {
+  id                  String        @id @default(cuid())
+  studentId           String        @map("student_id")
+  level               AcademicLevel
+  institution         String
+  boardUniversity     String?       @map("board_university")
+  country             String?
+  fieldOfStudy        String?       @map("field_of_study")
+  startDate           DateTime?     @map("start_date")
+  endDate             DateTime?     @map("end_date")
+  isCompleted         Boolean       @default(true) @map("is_completed")
+  gradeType           GradeType?    @map("grade_type")
+  gradeValue          String?       @map("grade_value")
+  maxGrade            String?       @map("max_grade")
+  backlogs            Int           @default(0)
+  mediumOfInstruction String?       @map("medium_of_instruction")
+  createdAt           DateTime      @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("academic_records")
+}
+
+// ─── Test Scores ──────────────────────────────────────────────────────────────
+
+model TestScore {
+  id             String    @id @default(cuid())
+  studentId      String    @map("student_id")
+  testType       TestType  @map("test_type")
+  overallScore   String    @map("overall_score")
+  subScores      Json?     @map("sub_scores")
+  testDate       DateTime  @map("test_date")
+  expiryDate     DateTime? @map("expiry_date")
+  reportNumber   String?   @map("report_number")
+  isVerified     Boolean   @default(false) @map("is_verified")
+  certificateUrl String?   @map("certificate_url")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("test_scores")
+}
+
+// ─── Work Experience ──────────────────────────────────────────────────────────
+
+model WorkExperience {
+  id               String    @id @default(cuid())
+  studentId        String    @map("student_id")
+  companyName      String    @map("company_name")
+  designation      String
+  industry         String?
+  startDate        DateTime  @map("start_date")
+  endDate          DateTime? @map("end_date")
+  isCurrent        Boolean   @default(false) @map("is_current")
+  responsibilities String?
+  country          String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("work_experiences")
+}
+
+// ─── Family Members ───────────────────────────────────────────────────────────
+
+model FamilyMember {
+  id           String             @id @default(cuid())
+  studentId    String             @map("student_id")
+  relationship FamilyRelationship
+  name         String
+  occupation   String?
+  employer     String?
+  annualIncome Decimal?           @map("annual_income")
+  phone        String?
+  email        String?
+  education    String?
+  address      String?
+  createdAt    DateTime           @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("family_members")
+}
+
+// ─── Student Documents ────────────────────────────────────────────────────────
+
+model StudentDocument {
+  id              String         @id @default(cuid())
+  studentId       String         @map("student_id")
+  documentType    DocumentType   @map("document_type")
+  fileName        String         @map("file_name")
+  fileUrl         String         @map("file_url")
+  fileSize        Int?           @map("file_size")
+  mimeType        String?        @map("mime_type")
+  status          DocumentStatus @default(PENDING_REVIEW)
+  rejectionReason String?        @map("rejection_reason")
+  verifiedById    String?        @map("verified_by_id")
+  verifiedAt      DateTime?      @map("verified_at")
+  expiryDate      DateTime?      @map("expiry_date")
+  notes           String?
+  uploadedById    String         @map("uploaded_by_id")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  student         Student               @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  verifiedBy      User?                 @relation("VerifiedBy", fields: [verifiedById], references: [id])
+  uploadedBy      User                  @relation("UploadedBy", fields: [uploadedById], references: [id])
+  applicationDocs ApplicationDocument[]
+
+  @@map("student_documents")
+}
+
+// ─── Communication Logs ───────────────────────────────────────────────────────
+
+model CommunicationLog {
+  id              String                 @id @default(cuid())
+  studentId       String                 @map("student_id")
+  type            CommunicationType
+  direction       CommunicationDirection
+  subject         String?
+  summary         String
+  durationMinutes Int?                   @map("duration_minutes")
+  phoneNumber     String?                @map("phone_number")
+  emailAddress    String?                @map("email_address")
+  outcome         CallOutcome?
+  followUpDate    DateTime?              @map("follow_up_date")
+  loggedById      String                 @map("logged_by_id")
+  createdAt       DateTime               @default(now()) @map("created_at")
+
+  student  Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  loggedBy User    @relation(fields: [loggedById], references: [id])
+
+  @@map("communication_logs")
+}
+
+// ─── Notes ────────────────────────────────────────────────────────────────────
+
+model Note {
+  id            String   @id @default(cuid())
+  studentId     String?  @map("student_id")
+  applicationId String?  @map("application_id")
+  content       String
+  isPinned      Boolean  @default(false) @map("is_pinned")
+  createdById   String   @map("created_by_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  student     Student?     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id])
+  createdBy   User         @relation(fields: [createdById], references: [id])
+
+  @@map("notes")
+}
+
+// ─── Tasks ────────────────────────────────────────────────────────────────────
+
+model Task {
+  id            String       @id @default(cuid())
+  title         String
+  description   String?
+  studentId     String?      @map("student_id")
+  applicationId String?      @map("application_id")
+  assignedToId  String       @map("assigned_to_id")
+  assignedById  String       @map("assigned_by_id")
+  priority      TaskPriority @default(MEDIUM)
+  status        TaskStatus   @default(PENDING)
+  dueDate       DateTime     @map("due_date")
+  completedAt   DateTime?    @map("completed_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  student    Student? @relation(fields: [studentId], references: [id])
+  assignedTo User     @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  assignedBy User     @relation("TaskCreator", fields: [assignedById], references: [id])
+
+  @@map("tasks")
+}
+
+// ─── Country ──────────────────────────────────────────────────────────────────
+
+model Country {
+  id                      String   @id @default(cuid())
+  name                    String
+  code                    String   @unique
+  flagEmoji               String?  @map("flag_emoji")
+  currency                String   @default("USD")
+  isActive                Boolean  @default(true) @map("is_active")
+  visaInfo                Json?    @map("visa_info")
+  livingCostRange         String?  @map("living_cost_range")
+  workRights              String?  @map("work_rights")
+  postStudyWork           String?  @map("post_study_work")
+  healthInsuranceRequired Boolean  @default(false) @map("health_insurance_required")
+  notes                   String?
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  universities University[]
+  requirements CountryRequirement[]
+  intakes      Intake[]
+
+  @@map("countries")
+}
+
+// ─── Country Requirements ─────────────────────────────────────────────────────
+
+model CountryRequirement {
+  id           String       @id @default(cuid())
+  countryId    String       @map("country_id")
+  documentType DocumentType @map("document_type")
+  isMandatory  Boolean      @default(true) @map("is_mandatory")
+  description  String?
+  notes        String?
+
+  country Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  @@unique([countryId, documentType])
+  @@map("country_requirements")
+}
+
+// ─── University ───────────────────────────────────────────────────────────────
+
+model University {
+  id              String         @id @default(cuid())
+  countryId       String         @map("country_id")
+  name            String
+  shortName       String?        @map("short_name")
+  website         String?
+  rankingGlobal   Int?           @map("ranking_global")
+  rankingNational Int?           @map("ranking_national")
+  city            String
+  state           String?
+  type            UniversityType @default(PUBLIC)
+  logoUrl         String?        @map("logo_url")
+  contactEmail    String?        @map("contact_email")
+  contactPhone    String?        @map("contact_phone")
+  agentPortalUrl  String?        @map("agent_portal_url")
+  commissionRate  Decimal?       @map("commission_rate")
+  isPartner       Boolean        @default(false) @map("is_partner")
+  isActive        Boolean        @default(true) @map("is_active")
+  notes           String?
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  country  Country   @relation(fields: [countryId], references: [id])
+  programs Program[]
+
+  @@map("universities")
+}
+
+// ─── Intake ───────────────────────────────────────────────────────────────────
+
+model Intake {
+  id                  String    @id @default(cuid())
+  countryId           String    @map("country_id")
+  name                String
+  startDate           DateTime  @map("start_date")
+  applicationDeadline DateTime? @map("application_deadline")
+  isActive            Boolean   @default(true) @map("is_active")
+
+  country      Country       @relation(fields: [countryId], references: [id])
+  applications Application[]
+
+  @@map("intakes")
+}
+
+// ─── Program ──────────────────────────────────────────────────────────────────
+
+model Program {
+  id                   String       @id @default(cuid())
+  universityId         String       @map("university_id")
+  name                 String
+  level                StudyLevel
+  field                String
+  durationMonths       Int          @map("duration_months")
+  tuitionFee           Decimal      @map("tuition_fee")
+  feeCurrency          String       @default("USD") @map("fee_currency")
+  applicationFee       Decimal?     @map("application_fee")
+  scholarshipAvailable Boolean      @default(false) @map("scholarship_available")
+  scholarshipDetails   String?      @map("scholarship_details")
+  language             String       @default("English")
+  deliveryMode         DeliveryMode @default(ON_CAMPUS) @map("delivery_mode")
+  campus               String?
+  isActive             Boolean      @default(true) @map("is_active")
+  notes                String?
+  createdAt            DateTime     @default(now()) @map("created_at")
+
+  university   University           @relation(fields: [universityId], references: [id])
+  requirements ProgramRequirement[]
+  applications Application[]
+
+  @@map("programs")
+}
+
+// ─── Program Requirements ─────────────────────────────────────────────────────
+
+model ProgramRequirement {
+  id              String          @id @default(cuid())
+  programId       String          @map("program_id")
+  requirementType RequirementType @map("requirement_type")
+  minValue        String          @map("min_value")
+  maxValue        String?         @map("max_value")
+  description     String?
+  isMandatory     Boolean         @default(true) @map("is_mandatory")
+
+  program Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@map("program_requirements")
+}
+
+// ─── Application ──────────────────────────────────────────────────────────────
+
+model Application {
+  id                String            @id @default(cuid())
+  applicationNumber String            @unique @map("application_number")
+  studentId         String            @map("student_id")
+  programId         String            @map("program_id")
+  intakeId          String?           @map("intake_id")
+  status            ApplicationStatus @default(DRAFT)
+  submissionDate    DateTime?         @map("submission_date")
+  offerDate         DateTime?         @map("offer_date")
+  offerDeadline     DateTime?         @map("offer_deadline")
+  depositAmount     Decimal?          @map("deposit_amount")
+  depositPaid       Boolean           @default(false) @map("deposit_paid")
+  depositDate       DateTime?         @map("deposit_date")
+  universityRef     String?           @map("university_ref")
+  assignedToId      String?           @map("assigned_to_id")
+  notes             String?
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  student          Student               @relation(fields: [studentId], references: [id])
+  program          Program               @relation(fields: [programId], references: [id])
+  intake           Intake?               @relation(fields: [intakeId], references: [id])
+  statusHistory    ApplicationHistory[]
+  applicationDocs  ApplicationDocument[]
+  applicationNotes Note[]
+
+  @@map("applications")
+}
+
+// ─── Application Status History ───────────────────────────────────────────────
+
+model ApplicationHistory {
+  id            String   @id @default(cuid())
+  applicationId String   @map("application_id")
+  fromStatus    String?  @map("from_status")
+  toStatus      String   @map("to_status")
+  changedById   String   @map("changed_by_id")
+  notes         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  changedBy   User        @relation(fields: [changedById], references: [id])
+
+  @@map("application_history")
+}
+
+// ─── Application Documents ────────────────────────────────────────────────────
+
+model ApplicationDocument {
+  id            String   @id @default(cuid())
+  applicationId String   @map("application_id")
+  documentId    String   @map("document_id")
+  notes         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  application Application    @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  document    StudentDocument @relation(fields: [documentId], references: [id])
+
+  @@unique([applicationId, documentId])
+  @@map("application_documents")
+}
+
+// ─── Activity Log (Audit Trail) ───────────────────────────────────────────────
+
+model ActivityLog {
+  id            String   @id @default(cuid())
+  entityType    String   @map("entity_type")
+  entityId      String   @map("entity_id")
+  action        String
+  changes       Json?
+  performedById String   @map("performed_by_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  performedBy User @relation(fields: [performedById], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([performedById])
+  @@map("activity_logs")
+}
