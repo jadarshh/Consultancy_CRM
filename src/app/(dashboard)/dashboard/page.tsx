@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { Users, FileText, CheckSquare, Phone, TrendingUp, Clock } from "lucide-react";
+import { Users, FileText, CheckSquare, Phone, Clock, TrendingUp, Plane, Award } from "lucide-react";
 import { StatCard } from "@/components/ui/card";
 import { format } from "date-fns";
 import Link from "next/link";
@@ -21,6 +21,13 @@ async function getDashboardData(userId: string, role: string) {
     recentActivity,
     upcomingFollowUps,
     myTasks,
+    // New stat counts
+    visaPendingCount,
+    applicationPhaseCount,
+    visaApprovedCount,
+    enrolledCount,
+    // Course enrollments
+    courseEnrollments,
   ] = await Promise.all([
     prisma.student.count({ where: { ...whereStudent, isActive: true } }),
     prisma.application.count({
@@ -69,6 +76,33 @@ async function getDashboardData(userId: string, role: string) {
       orderBy: [{ priority: "desc" }, { dueDate: "asc" }],
       include: { student: { select: { firstName: true, lastName: true, id: true } } },
     }),
+    // Visa Pending
+    prisma.student.count({
+      where: { ...whereStudent, isActive: true, stage: "VISA_APPLIED" as never },
+    }),
+    // Application Phase: APPLICATION_PREP + APPLICATIONS_SUBMITTED + OFFER_RECEIVED
+    prisma.student.count({
+      where: {
+        ...whereStudent,
+        isActive: true,
+        stage: { in: ["APPLICATION_PREP", "APPLICATIONS_SUBMITTED", "OFFER_RECEIVED"] as never[] },
+      },
+    }),
+    // Visa Approved
+    prisma.student.count({
+      where: { ...whereStudent, isActive: true, stage: "VISA_APPROVED" as never },
+    }),
+    // Enrolled
+    prisma.student.count({
+      where: { ...whereStudent, isActive: true, stage: "ENROLLED" as never },
+    }),
+    // Course enrollments by type
+    prisma.studentCourse.groupBy({
+      by: ["courseType"],
+      where: { status: "ENROLLED", student: { ...whereStudent, isActive: true } },
+      _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
+    }),
   ]);
 
   return {
@@ -80,6 +114,11 @@ async function getDashboardData(userId: string, role: string) {
     recentActivity,
     upcomingFollowUps,
     myTasks,
+    visaPendingCount,
+    applicationPhaseCount,
+    visaApprovedCount,
+    enrolledCount,
+    courseEnrollments,
   };
 }
 
@@ -88,6 +127,20 @@ const PRIORITY_DOT: Record<string, string> = {
   HIGH: "bg-orange-500",
   MEDIUM: "bg-yellow-500",
   LOW: "bg-gray-400",
+};
+
+const COURSE_TYPE_LABELS: Record<string, string> = {
+  IELTS_PREP: "IELTS Prep",
+  TOEFL_PREP: "TOEFL Prep",
+  PTE_PREP: "PTE Prep",
+  DUOLINGO_PREP: "Duolingo Prep",
+  GRE_PREP: "GRE Prep",
+  GMAT_PREP: "GMAT Prep",
+  SAT_PREP: "SAT Prep",
+  ACT_PREP: "ACT Prep",
+  ENGLISH_LANGUAGE: "English Language",
+  FOUNDATION_PROGRAM: "Foundation Program",
+  OTHER: "Other",
 };
 
 export default async function DashboardPage() {
@@ -117,7 +170,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Stat Cards */}
+      {/* Original Stat Cards Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Total Students"
@@ -142,6 +195,34 @@ export default async function DashboardPage() {
           value={data.todayFollowUps.toLocaleString()}
           icon={<Phone className="w-5 h-5" />}
           color={data.todayFollowUps > 0 ? "warning" : "primary"}
+        />
+      </div>
+
+      {/* New Journey Stage Stats Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="Visa Pending"
+          value={data.visaPendingCount.toLocaleString()}
+          icon={<Plane className="w-5 h-5" />}
+          color={data.visaPendingCount > 0 ? "warning" : "primary"}
+        />
+        <StatCard
+          label="Application Phase"
+          value={data.applicationPhaseCount.toLocaleString()}
+          icon={<TrendingUp className="w-5 h-5" />}
+          color="primary"
+        />
+        <StatCard
+          label="Visa Approved"
+          value={data.visaApprovedCount.toLocaleString()}
+          icon={<Award className="w-5 h-5" />}
+          color="success"
+        />
+        <StatCard
+          label="Enrolled"
+          value={data.enrolledCount.toLocaleString()}
+          icon={<Users className="w-5 h-5" />}
+          color="success"
         />
       </div>
 
@@ -196,7 +277,10 @@ export default async function DashboardPage() {
             ))}
             {data.pipelineStats.length === 0 && (
               <p className="text-sm text-center py-6" style={{ color: "var(--text-muted)" }}>
-                No active students yet. <Link href="/students/new" className="underline" style={{ color: "var(--accent)" }}>Add one →</Link>
+                No active students yet.{" "}
+                <Link href="/students/new" className="underline" style={{ color: "var(--accent)" }}>
+                  Add one →
+                </Link>
               </p>
             )}
           </div>
@@ -337,6 +421,38 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Course Enrollments Summary */}
+      {data.courseEnrollments.length > 0 && (
+        <div className="card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
+                Course Enrollments
+              </h2>
+              <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                Students currently enrolled in prep courses
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {data.courseEnrollments.map(({ courseType, _count }) => (
+              <div
+                key={courseType}
+                className="text-center p-3 rounded-xl"
+                style={{ background: "var(--background)" }}
+              >
+                <p className="text-xl font-bold" style={{ color: "var(--primary)" }}>
+                  {_count.id}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>
+                  {COURSE_TYPE_LABELS[courseType] || courseType}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

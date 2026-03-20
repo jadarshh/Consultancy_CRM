@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Phone, Mail, MessageSquare, MapPin, Flag, Edit, GraduationCap } from "lucide-react";
+import CommunicationSection from "@/components/students/CommunicationSection";
+import { StageChangeButton } from "@/components/students/StageChangeButton";
 import {
   STAGE_LABELS, STAGE_COLORS, formatDate, formatCurrency, snakeToTitle, timeAgo
 } from "@/lib/utils";
@@ -151,6 +153,11 @@ export default async function StudentDetailPage({
               <span className={`badge ${stageColor}`}>
                 {STAGE_LABELS[student.stage] || student.stage}
               </span>
+              <StageChangeButton
+                studentId={student.id}
+                currentStage={student.stage}
+                userRole={session?.user.role || ""}
+              />
               <span className={`badge priority-${student.priority.toLowerCase()}`}>
                 {student.priority} Priority
               </span>
@@ -610,36 +617,7 @@ export default async function StudentDetailPage({
 
         {/* ── Communications Tab ─────────────────────────────────────────────── */}
         {tab === "communications" && (
-          <div className="space-y-3">
-            {student.communicationLogs.map((log) => (
-              <div key={log.id} className="card p-4 flex items-start gap-4">
-                <span className="text-2xl">{COMM_ICONS[log.type] || "💬"}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-medium text-sm" style={{ color: "var(--text-primary)" }}>
-                      {log.subject || snakeToTitle(log.type)}
-                    </p>
-                    <span className="badge badge-neutral text-[10px]">{snakeToTitle(log.direction)}</span>
-                    {log.outcome && <span className="badge badge-neutral text-[10px]">{snakeToTitle(log.outcome)}</span>}
-                  </div>
-                  <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>{log.summary}</p>
-                  {log.followUpDate && (
-                    <p className="text-xs mt-1" style={{ color: "var(--warning)" }}>
-                      📅 Follow up: {formatDate(log.followUpDate, "MMM dd, yyyy 'at' h:mm a")}
-                    </p>
-                  )}
-                  <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-                    by {log.loggedBy.firstName} {log.loggedBy.lastName} · {timeAgo(log.createdAt)}
-                  </p>
-                </div>
-              </div>
-            ))}
-            {student.communicationLogs.length === 0 && (
-              <div className="card p-12 text-center">
-                <p className="text-sm" style={{ color: "var(--text-muted)" }}>No communications logged</p>
-              </div>
-            )}
-          </div>
+          <CommunicationSection studentId={student.id} />
         )}
 
         {/* ── Notes Tab ─────────────────────────────────────────────────────── */}

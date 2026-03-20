@@ -180,6 +180,27 @@ enum DocumentStatus {
   EXPIRED
 }
 
+enum CourseStatus {
+  NEEDS
+  ENROLLED
+  COMPLETED
+  DROPPED
+}
+
+enum CourseType {
+  IELTS_PREP
+  TOEFL_PREP
+  PTE_PREP
+  DUOLINGO_PREP
+  GRE_PREP
+  GMAT_PREP
+  SAT_PREP
+  ACT_PREP
+  ENGLISH_LANGUAGE
+  FOUNDATION_PROGRAM
+  OTHER
+}
+
 enum CommunicationType {
   PHONE_CALL
   WHATSAPP
@@ -418,6 +439,7 @@ model Student {
   studentNotes      Note[]
   tasks             Task[]
   applications      Application[]
+  studentCourses    StudentCourse[]
 
   @@map("students")
 }
@@ -500,8 +522,11 @@ model FamilyMember {
   phone        String?
   email        String?
   education    String?
-  address      String?
-  createdAt    DateTime           @default(now()) @map("created_at")
+  address        String?
+  isSponsor      Boolean  @default(false) @map("is_sponsor")
+  incomeSource   String?  @map("income_source")
+  incomeCurrency String   @default("USD") @map("income_currency")
+  createdAt      DateTime @default(now()) @map("created_at")
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
@@ -576,6 +601,25 @@ model Note {
   createdBy   User         @relation(fields: [createdById], references: [id])
 
   @@map("notes")
+}
+
+// ─── Student Courses ──────────────────────────────────────────────────────────
+
+model StudentCourse {
+  id            String       @id @default(cuid())
+  studentId     String       @map("student_id")
+  courseType    CourseType   @map("course_type")
+  instituteName String?      @map("institute_name")
+  status        CourseStatus @default(NEEDS)
+  startDate     DateTime?    @map("start_date")
+  endDate       DateTime?    @map("end_date")
+  score         String?
+  notes         String?
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("student_courses")
 }
 
 // ─── Tasks ────────────────────────────────────────────────────────────────────
