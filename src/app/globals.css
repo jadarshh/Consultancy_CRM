@@ -366,6 +366,23 @@ body {
 .doc-item-missing  { border-left: 3px solid var(--danger); }
 .doc-item-expired  { border-left: 3px solid var(--text-muted); }
 
+/* ─── Mobile Responsive ──────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  body { font-size: 13px; }
+
+  .card { border-radius: 10px; }
+
+  main { padding: 16px !important; }
+
+  .btn { padding: 7px 12px; font-size: 13px; }
+
+  /* Stack grid layouts on mobile */
+  .mobile-stack { flex-direction: column !important; }
+
+  /* Hide sidebar text on mobile — sidebar collapses to icon-only */
+}
+
 /* ─── Utility ─────────────────────────────────────────────────────────────── */
 
 .truncate-2 {

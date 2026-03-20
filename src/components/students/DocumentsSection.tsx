@@ -12,6 +12,7 @@ interface StudentDocument {
   fileUrl: string;
   status: string;
   createdAt: string;
+  notes: string | null;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -51,6 +52,7 @@ export default function DocumentsSection({ studentId }: { studentId: string }) {
   // Upload form state
   const [documentType, setDocumentType] = useState("PASSPORT");
   const [file, setFile] = useState<File | null>(null);
+  const [notes, setNotes] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -85,6 +87,7 @@ export default function DocumentsSection({ studentId }: { studentId: string }) {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("documentType", documentType);
+      if (notes) formData.append("notes", notes);
 
       const res = await fetch(`/api/students/${studentId}/documents`, {
         method: "POST",
@@ -98,6 +101,7 @@ export default function DocumentsSection({ studentId }: { studentId: string }) {
 
       setFile(null);
       setDocumentType("PASSPORT");
+      setNotes("");
       setShowForm(false);
       fetchDocuments();
     } catch (err: unknown) {
@@ -271,6 +275,22 @@ export default function DocumentsSection({ studentId }: { studentId: string }) {
               />
             </div>
 
+            <div>
+              <label
+                className="block text-xs font-medium mb-1"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Description / Notes
+              </label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="input-base"
+                rows={3}
+                placeholder="Optional notes about this document"
+              />
+            </div>
+
             <div className="flex gap-2 pt-1">
               <button
                 type="submit"
@@ -309,6 +329,11 @@ export default function DocumentsSection({ studentId }: { studentId: string }) {
                 <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
                   {doc.fileName} · {formatDate(doc.createdAt)}
                 </p>
+                {doc.notes && (
+                  <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>
+                    {doc.notes}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <span className={`badge ${badgeClass}`}>

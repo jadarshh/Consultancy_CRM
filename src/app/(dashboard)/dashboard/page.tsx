@@ -1,12 +1,69 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { Users, FileText, CheckSquare, Phone, Clock, TrendingUp, Plane, Award } from "lucide-react";
+import {
+  Users,
+  FileText,
+  CheckSquare,
+  Phone,
+  Clock,
+  TrendingUp,
+  Plane,
+  Award,
+  BookOpen,
+  Trophy,
+} from "lucide-react";
 import { StatCard } from "@/components/ui/card";
 import { format } from "date-fns";
 import Link from "next/link";
 import { STAGE_LABELS, STAGE_COLORS, formatDate, timeAgo } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+
+// All known course types — always show every one, even with 0 enrollments
+const ALL_COURSE_TYPES = [
+  "IELTS_PREP",
+  "TOEFL_PREP",
+  "PTE_PREP",
+  "DUOLINGO_PREP",
+  "GRE_PREP",
+  "GMAT_PREP",
+  "SAT_PREP",
+  "ACT_PREP",
+  "ENGLISH_LANGUAGE",
+  "FOUNDATION_PROGRAM",
+  "OTHER",
+] as const;
+
+const COURSE_TYPE_LABELS: Record<string, string> = {
+  IELTS_PREP: "IELTS Prep",
+  TOEFL_PREP: "TOEFL Prep",
+  PTE_PREP: "PTE Prep",
+  DUOLINGO_PREP: "Duolingo Prep",
+  GRE_PREP: "GRE Prep",
+  GMAT_PREP: "GMAT Prep",
+  SAT_PREP: "SAT Prep",
+  ACT_PREP: "ACT Prep",
+  ENGLISH_LANGUAGE: "English Language",
+  FOUNDATION_PROGRAM: "Foundation",
+  OTHER: "Other",
+};
+
+const ENTITY_TYPE_LABELS: Record<string, string> = {
+  STUDENT: "Student",
+  APPLICATION: "Application",
+  TASK: "Task",
+  COMMUNICATION: "Communication",
+  DOCUMENT: "Document",
+  NOTE: "Note",
+  COURSE: "Course",
+};
+
+const PRIORITY_DOT: Record<string, string> = {
+  URGENT: "bg-red-500",
+  HIGH: "bg-orange-500",
+  MEDIUM: "bg-yellow-500",
+  LOW: "bg-gray-400",
+};
 
 async function getDashboardData(userId: string, role: string) {
   const isAll = role === "ADMIN" || role === "MANAGER";
@@ -21,13 +78,12 @@ async function getDashboardData(userId: string, role: string) {
     recentActivity,
     upcomingFollowUps,
     myTasks,
-    // New stat counts
     visaPendingCount,
     applicationPhaseCount,
     visaApprovedCount,
     enrolledCount,
-    // Course enrollments
-    courseEnrollments,
+    courseEnrolled,
+    courseNeeds,
   ] = await Promise.all([
     prisma.student.count({ where: { ...whereStudent, isActive: true } }),
     prisma.application.count({
@@ -50,7 +106,11 @@ async function getDashboardData(userId: string, role: string) {
     }),
     prisma.student.groupBy({
       by: ["stage"],
-      where: { ...whereStudent, isActive: true, stage: { notIn: ["ON_HOLD", "WITHDRAWN", "VISA_REFUSED", "NOT_QUALIFIED"] } },
+      where: {
+        ...whereStudent,
+        isActive: true,
+        stage: { notIn: ["ON_HOLD", "WITHDRAWN", "VISA_REFUSED", "NOT_QUALIFIED"] },
+      },
       _count: { id: true },
       orderBy: { _count: { id: "desc" } },
       take: 8,
@@ -80,7 +140,7 @@ async function getDashboardData(userId: string, role: string) {
     prisma.student.count({
       where: { ...whereStudent, isActive: true, stage: "VISA_APPLIED" as never },
     }),
-    // Application Phase: APPLICATION_PREP + APPLICATIONS_SUBMITTED + OFFER_RECEIVED
+    // Application Phase
     prisma.student.count({
       where: {
         ...whereStudent,
@@ -96,14 +156,59 @@ async function getDashboardData(userId: string, role: string) {
     prisma.student.count({
       where: { ...whereStudent, isActive: true, stage: "ENROLLED" as never },
     }),
-    // Course enrollments by type
+    // Course enrollments by type — ENROLLED status
     prisma.studentCourse.groupBy({
       by: ["courseType"],
       where: { status: "ENROLLED", student: { ...whereStudent, isActive: true } },
       _count: { id: true },
-      orderBy: { _count: { id: "desc" } },
+    }),
+    // Course needs — NEEDS_ENROLLMENT status
+    prisma.studentCourse.groupBy({
+      by: ["courseType"],
+      where: { status: "NEEDS", student: { ...whereStudent, isActive: true } },
+      _count: { id: true },
     }),
   ]);
+
+  // Build merged course map: courseType -> { enrolled, needs }
+  const courseMap: Record<string, { enrolled: number; needs: number }> = {};
+  for (const row of courseEnrolled) {
+    if (!courseMap[row.courseType]) courseMap[row.courseType] = { enrolled: 0, needs: 0 };
+    courseMap[row.courseType].enrolled = row._count.id;
+  }
+  for (const row of courseNeeds) {
+    if (!courseMap[row.courseType]) courseMap[row.courseType] = { enrolled: 0, needs: 0 };
+    courseMap[row.courseType].needs = row._count.id;
+  }
+
+  // Counselor leaderboard — only for ADMIN / MANAGER
+  let leaderboard: { id: string; name: string; count: number }[] = [];
+  if (isAll) {
+    const grouped = await prisma.student.groupBy({
+      by: ["assignedCounselorId"],
+      where: { isActive: true, assignedCounselorId: { not: null } },
+      _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
+      take: 5,
+    });
+    const counselorIds = grouped
+      .map((g) => g.assignedCounselorId)
+      .filter(Boolean) as string[];
+    const users = await prisma.user.findMany({
+      where: { id: { in: counselorIds }, isActive: true },
+      select: { id: true, firstName: true, lastName: true },
+    });
+    const userMap = Object.fromEntries(users.map((u) => [u.id, u]));
+    leaderboard = grouped
+      .filter((g) => g.assignedCounselorId && userMap[g.assignedCounselorId!])
+      .map((g) => ({
+        id: g.assignedCounselorId!,
+        name: `${userMap[g.assignedCounselorId!].firstName} ${userMap[g.assignedCounselorId!].lastName}`,
+        count: g._count.id,
+      }));
+  }
+
+  const totalPipelineStudents = pipelineStats.reduce((sum, s) => sum + s._count.id, 0);
 
   return {
     totalStudents,
@@ -118,59 +223,109 @@ async function getDashboardData(userId: string, role: string) {
     applicationPhaseCount,
     visaApprovedCount,
     enrolledCount,
-    courseEnrollments,
+    courseMap,
+    leaderboard,
+    isAll,
+    totalPipelineStudents,
   };
 }
 
-const PRIORITY_DOT: Record<string, string> = {
-  URGENT: "bg-red-500",
-  HIGH: "bg-orange-500",
-  MEDIUM: "bg-yellow-500",
-  LOW: "bg-gray-400",
-};
-
-const COURSE_TYPE_LABELS: Record<string, string> = {
-  IELTS_PREP: "IELTS Prep",
-  TOEFL_PREP: "TOEFL Prep",
-  PTE_PREP: "PTE Prep",
-  DUOLINGO_PREP: "Duolingo Prep",
-  GRE_PREP: "GRE Prep",
-  GMAT_PREP: "GMAT Prep",
-  SAT_PREP: "SAT Prep",
-  ACT_PREP: "ACT Prep",
-  ENGLISH_LANGUAGE: "English Language",
-  FOUNDATION_PROGRAM: "Foundation Program",
-  OTHER: "Other",
-};
-
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string }>;
+}) {
   const session = await auth();
   if (!session) return null;
 
-  const data = await getDashboardData(session.user.id, session.user.role);
+  const sp = await searchParams;
+
+  const role = session.user.role as string;
+  const data = await getDashboardData(session.user.id, role);
   const firstName = session.user.name?.split(" ")[0] || "there";
   const today = format(new Date(), "EEEE, MMMM do");
 
   const maxStageCount = Math.max(...data.pipelineStats.map((s) => s._count.id), 1);
 
+  const roleLabel =
+    role === "ADMIN"
+      ? "Admin"
+      : role === "MANAGER"
+      ? "Manager"
+      : role === "COUNSELOR"
+      ? "Counselor"
+      : role;
+
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Access denied banner */}
+      {sp?.error === "access_denied" && (
+        <div className="p-3 rounded-lg text-sm" style={{ background: "var(--danger-bg)", color: "var(--danger)" }}>
+          You don&apos;t have permission to access that page.
+        </div>
+      )}
+
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-            Good morning, {firstName} 👋
-          </h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+              Good morning, {firstName}
+            </h1>
+            <span
+              className="badge badge-primary text-xs px-2 py-0.5 rounded-full font-semibold"
+              style={{ background: "var(--primary-50)", color: "var(--primary)" }}
+            >
+              {roleLabel}
+            </span>
+          </div>
           <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>
             {today}
           </p>
         </div>
-        <Link href="/students/new" className="btn btn-primary">
-          + Add Student
+      </div>
+
+      {/* Quick Actions pill row */}
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/students/new"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90 hover:scale-[1.02]"
+          style={{ background: "var(--primary)", color: "#fff" }}
+        >
+          <Users className="w-3.5 h-3.5" />
+          Add Student
+        </Link>
+        <Link
+          href="/communication/new"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90 hover:scale-[1.02]"
+          style={{ background: "var(--accent)", color: "#fff" }}
+        >
+          <Phone className="w-3.5 h-3.5" />
+          Log Communication
+        </Link>
+        <Link
+          href="/tasks/new"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90 hover:scale-[1.02]"
+          style={{ background: "var(--success)", color: "#fff" }}
+        >
+          <CheckSquare className="w-3.5 h-3.5" />
+          Add Task
+        </Link>
+        <Link
+          href="/pipeline"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-all hover:opacity-90 hover:scale-[1.02]"
+          style={{
+            background: "var(--surface)",
+            color: "var(--text-primary)",
+            borderColor: "var(--border)",
+          }}
+        >
+          <TrendingUp className="w-3.5 h-3.5" />
+          View Pipeline
         </Link>
       </div>
 
-      {/* Original Stat Cards Row */}
+      {/* Stat Cards Row 1 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Total Students"
@@ -198,7 +353,7 @@ export default async function DashboardPage() {
         />
       </div>
 
-      {/* New Journey Stage Stats Row */}
+      {/* Stat Cards Row 2 — Journey Stage */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Visa Pending"
@@ -230,13 +385,15 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pipeline Overview */}
         <div className="lg:col-span-2 card p-6">
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-1">
             <div>
               <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
                 Pipeline Overview
               </h2>
               <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-                Active students by stage
+                {data.totalPipelineStudents > 0
+                  ? `${data.totalPipelineStudents} active student${data.totalPipelineStudents !== 1 ? "s" : ""} across pipeline`
+                  : "No active students in pipeline"}
               </p>
             </div>
             <Link
@@ -248,13 +405,11 @@ export default async function DashboardPage() {
             </Link>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 mt-5">
             {data.pipelineStats.map(({ stage, _count }) => (
               <div key={stage} className="flex items-center gap-3">
                 <div className="w-36 shrink-0">
-                  <span
-                    className={`badge ${STAGE_COLORS[stage] || "badge-neutral"} text-[10px]`}
-                  >
+                  <span className={`badge ${STAGE_COLORS[stage] || "badge-neutral"} text-[10px]`}>
                     {STAGE_LABELS[stage] || stage}
                   </span>
                 </div>
@@ -303,7 +458,7 @@ export default async function DashboardPage() {
 
           <div className="space-y-3">
             {data.myTasks.map((task) => {
-              const overdue = new Date(task.dueDate) < new Date();
+              const overdue = task.dueDate && new Date(task.dueDate) < new Date();
               return (
                 <div
                   key={task.id}
@@ -321,9 +476,13 @@ export default async function DashboardPage() {
                       {task.title}
                     </p>
                     {task.student && (
-                      <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                      <Link
+                        href={`/students/${task.student.id}`}
+                        className="text-xs hover:underline"
+                        style={{ color: "var(--accent)" }}
+                      >
                         {task.student.firstName} {task.student.lastName}
-                      </p>
+                      </Link>
                     )}
                     <p
                       className={`text-xs mt-1 ${overdue ? "text-red-500 font-medium" : ""}`}
@@ -344,7 +503,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Bottom Grid */}
+      {/* Bottom Grid — Recent Activity + Upcoming Follow-ups */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
         <div className="card p-6">
@@ -352,25 +511,49 @@ export default async function DashboardPage() {
             Recent Activity
           </h2>
           <div className="space-y-3">
-            {data.recentActivity.map((log) => (
-              <div key={log.id} className="flex items-start gap-3">
-                <div
-                  className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
-                  style={{ background: "var(--accent)" }}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                    <span className="font-medium" style={{ color: "var(--text-primary)" }}>
-                      {log.performedBy.firstName}
-                    </span>{" "}
-                    {log.action.toLowerCase().replace(/_/g, " ")} — {log.entityType}
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-                    {timeAgo(log.createdAt)}
-                  </p>
+            {data.recentActivity.map((log) => {
+              const entityLabel =
+                ENTITY_TYPE_LABELS[log.entityType] || log.entityType;
+              const entityPath =
+                log.entityType === "STUDENT"
+                  ? `/students/${log.entityId}`
+                  : log.entityType === "APPLICATION"
+                  ? `/applications/${log.entityId}`
+                  : log.entityType === "TASK"
+                  ? `/tasks/${log.entityId}`
+                  : null;
+
+              return (
+                <div key={log.id} className="flex items-start gap-3">
+                  <div
+                    className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0"
+                    style={{ background: "var(--accent)" }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                      <span className="font-medium" style={{ color: "var(--text-primary)" }}>
+                        {log.performedBy.firstName} {log.performedBy.lastName}
+                      </span>{" "}
+                      {log.action.toLowerCase().replace(/_/g, " ")} —{" "}
+                      {entityPath ? (
+                        <Link
+                          href={entityPath}
+                          className="hover:underline"
+                          style={{ color: "var(--accent)" }}
+                        >
+                          {entityLabel}
+                        </Link>
+                      ) : (
+                        <span>{entityLabel}</span>
+                      )}
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                      {timeAgo(log.createdAt)}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {data.recentActivity.length === 0 && (
               <p className="text-sm" style={{ color: "var(--text-muted)" }}>
                 No recent activity
@@ -385,7 +568,11 @@ export default async function DashboardPage() {
             <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
               Upcoming Follow-ups
             </h2>
-            <Link href="/communication" className="text-sm font-medium hover:underline" style={{ color: "var(--accent)" }}>
+            <Link
+              href="/communication"
+              className="text-sm font-medium hover:underline"
+              style={{ color: "var(--accent)" }}
+            >
               View all →
             </Link>
           </div>
@@ -400,7 +587,8 @@ export default async function DashboardPage() {
                   className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
                   style={{ background: "var(--primary)" }}
                 >
-                  {log.student.firstName.charAt(0)}{log.student.lastName.charAt(0)}
+                  {log.student.firstName.charAt(0)}
+                  {log.student.lastName.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
@@ -422,34 +610,87 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Course Enrollments Summary */}
-      {data.courseEnrollments.length > 0 && (
-        <div className="card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
-                Course Enrollments
-              </h2>
-              <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-                Students currently enrolled in prep courses
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {data.courseEnrollments.map(({ courseType, _count }) => (
+      {/* Course Enrollments — always shown */}
+      <div className="card p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <BookOpen className="w-5 h-5" style={{ color: "var(--primary)" }} />
+          <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
+            Course Enrollments
+          </h2>
+        </div>
+        <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
+          Students enrolled or needing enrollment in prep courses
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {ALL_COURSE_TYPES.map((courseType) => {
+            const counts = data.courseMap[courseType] ?? { enrolled: 0, needs: 0 };
+            return (
               <div
                 key={courseType}
                 className="text-center p-3 rounded-xl"
                 style={{ background: "var(--background)" }}
               >
                 <p className="text-xl font-bold" style={{ color: "var(--primary)" }}>
-                  {_count.id}
+                  {counts.enrolled}
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>
+                <p className="text-xs mt-0.5 font-medium" style={{ color: "var(--text-secondary)" }}>
                   {COURSE_TYPE_LABELS[courseType] || courseType}
                 </p>
+                {counts.needs > 0 && (
+                  <p className="text-xs mt-1" style={{ color: "var(--warning)" }}>
+                    {counts.needs} need{counts.needs !== 1 ? "s" : ""} enrollment
+                  </p>
+                )}
               </div>
-            ))}
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Counselor Leaderboard — ADMIN / MANAGER only */}
+      {data.isAll && data.leaderboard.length > 0 && (
+        <div className="card p-6">
+          <div className="flex items-center gap-2 mb-1">
+            <Trophy className="w-5 h-5" style={{ color: "var(--warning)" }} />
+            <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
+              Counselor Leaderboard
+            </h2>
+          </div>
+          <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
+            Top counselors by active student count
+          </p>
+          <div className="space-y-3">
+            {data.leaderboard.map((entry, idx) => {
+              const maxCount = data.leaderboard[0]?.count || 1;
+              const medals = ["🥇", "🥈", "🥉"];
+              return (
+                <div key={entry.id} className="flex items-center gap-3">
+                  <span className="text-base w-6 text-center flex-shrink-0">
+                    {medals[idx] ?? `${idx + 1}.`}
+                  </span>
+                  <div className="w-28 shrink-0">
+                    <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
+                      {entry.name}
+                    </p>
+                  </div>
+                  <div className="flex-1 h-2 rounded-full" style={{ background: "var(--border)" }}>
+                    <div
+                      className="h-2 rounded-full transition-all"
+                      style={{
+                        width: `${(entry.count / maxCount) * 100}%`,
+                        background: idx === 0 ? "var(--warning)" : "var(--primary)",
+                      }}
+                    />
+                  </div>
+                  <span
+                    className="text-sm font-semibold w-8 text-right flex-shrink-0"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {entry.count}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

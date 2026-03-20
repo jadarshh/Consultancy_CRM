@@ -28,7 +28,7 @@ export function Topbar() {
 
   return (
     <header
-      className="sticky top-0 z-30 flex items-center gap-4 px-6 py-3 border-b"
+      className="sticky top-0 z-30 flex items-center gap-4 px-6 py-3 pl-14 md:pl-6 border-b"
       style={{
         background: "var(--surface)",
         borderColor: "var(--border)",

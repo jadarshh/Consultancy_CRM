@@ -41,6 +41,7 @@ export async function POST(
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
   const documentType = formData.get("documentType") as string | null;
+  const notes = formData.get("notes") as string | null;
 
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
   if (!documentType) return NextResponse.json({ error: "documentType is required" }, { status: 400 });
@@ -66,6 +67,7 @@ export async function POST(
       fileSize: buffer.length,
       mimeType: file.type || null,
       uploadedById: session.user.id,
+      notes: notes || null,
     },
     include: {
       uploadedBy: { select: { firstName: true, lastName: true } },

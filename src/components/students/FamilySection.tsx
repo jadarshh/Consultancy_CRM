@@ -187,7 +187,7 @@ function FamilyMemberForm({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
-              Annual Income
+              Annual / Gross Income
             </label>
             <input type="number" name="annualIncome" value={form.annualIncome} onChange={handleChange} className="input-base" placeholder="0" min="0" />
           </div>
@@ -246,6 +246,20 @@ function FamilyMemberForm({
           />
         </div>
 
+        <div>
+          <label className="block text-xs font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
+            Income Source
+          </label>
+          <input
+            type="text"
+            name="incomeSource"
+            value={form.incomeSource}
+            onChange={handleChange}
+            className="input-base"
+            placeholder="e.g. Business, Job, Property"
+          />
+        </div>
+
         {/* Sponsor checkbox */}
         <label className="flex items-center gap-2 cursor-pointer">
           <input
@@ -259,22 +273,6 @@ function FamilyMemberForm({
             This person is a financial sponsor
           </span>
         </label>
-
-        {form.isSponsor && (
-          <div>
-            <label className="block text-xs font-medium mb-1" style={{ color: "var(--text-secondary)" }}>
-              Source of Income
-            </label>
-            <input
-              type="text"
-              name="incomeSource"
-              value={form.incomeSource}
-              onChange={handleChange}
-              className="input-base"
-              placeholder="e.g. Business, Job, Property"
-            />
-          </div>
-        )}
 
         <div className="flex gap-2 pt-1">
           <button type="submit" disabled={submitting} className="btn btn-primary text-sm">
@@ -350,7 +348,7 @@ export default function FamilySection({ studentId }: { studentId: string }) {
         education: data.education || undefined,
         address: data.address || undefined,
         isSponsor: data.isSponsor,
-        incomeSource: data.isSponsor && data.incomeSource ? data.incomeSource : undefined,
+        incomeSource: data.incomeSource || undefined,
       };
 
       const url = editingMember
@@ -498,7 +496,7 @@ export default function FamilySection({ studentId }: { studentId: string }) {
                       </p>
                     )}
 
-                    {member.isSponsor && member.incomeSource && (
+                    {member.incomeSource && (
                       <p
                         className="text-xs mt-1 font-medium"
                         style={{ color: "var(--accent)" }}

@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Phone, Mail, MessageSquare, MapPin, Flag, Edit, GraduationCap } from "lucide-react";
 import CommunicationSection from "@/components/students/CommunicationSection";
+import CoursesSection from "@/components/students/CoursesSection";
+import FamilySection from "@/components/students/FamilySection";
 import { StageChangeButton } from "@/components/students/StageChangeButton";
+import DocumentsSection from "@/components/students/DocumentsSection";
 import {
   STAGE_LABELS, STAGE_COLORS, formatDate, formatCurrency, snakeToTitle, timeAgo
 } from "@/lib/utils";
@@ -85,6 +88,7 @@ export default async function StudentDetailPage({
     { key: "personal", label: "Personal" },
     { key: "academic", label: "Academic" },
     { key: "documents", label: `Docs (${student.documents.length})` },
+    { key: "courses", label: "Courses" },
     { key: "applications", label: `Applications (${student.applications.length})` },
     { key: "communications", label: "Communications" },
     { key: "notes", label: `Notes (${student.studentNotes.length})` },
@@ -190,7 +194,10 @@ export default async function StudentDetailPage({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/students/${id}?tab=communications`} className="btn btn-secondary text-sm">
+              <MessageSquare className="w-4 h-4" /> Log Comm
+            </Link>
             <Link href={`/students/${id}/edit`} className="btn btn-secondary text-sm">
               <Edit className="w-4 h-4" /> Edit
             </Link>
@@ -279,7 +286,12 @@ export default async function StudentDetailPage({
               {/* Recent Communications */}
               {student.communicationLogs.length > 0 && (
                 <div className="card p-5">
-                  <h3 className="font-semibold mb-3" style={{ color: "var(--text-primary)" }}>Recent Activity</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-semibold" style={{ color: "var(--text-primary)" }}>Recent Activity</h3>
+                    <Link href={`/students/${id}?tab=communications`} className="text-xs font-medium hover:underline" style={{ color: "var(--accent)" }}>
+                      Log New →
+                    </Link>
+                  </div>
                   <div className="space-y-3">
                     {student.communicationLogs.slice(0, 4).map((log) => (
                       <div key={log.id} className="flex items-start gap-3">
@@ -401,27 +413,11 @@ export default async function StudentDetailPage({
               <InfoRow label="Phone" value={student.emergencyPhone} />
               <InfoRow label="Relationship" value={student.emergencyRelationship} />
             </InfoCard>
-            <InfoCard title="Family Members">
-              {student.familyMembers.length > 0 ? (
-                <div className="space-y-4">
-                  {student.familyMembers.map((f) => (
-                    <div key={f.id} className="border-b last:border-0 pb-3 last:pb-0" style={{ borderColor: "var(--border)" }}>
-                      <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                        {f.name} — {snakeToTitle(f.relationship)}
-                      </p>
-                      {f.occupation && <p className="text-xs" style={{ color: "var(--text-secondary)" }}>{f.occupation}</p>}
-                      {f.annualIncome && (
-                        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                          Income: {formatCurrency(Number(f.annualIncome))}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm" style={{ color: "var(--text-muted)" }}>No family members added</p>
-              )}
-            </InfoCard>
+            <div className="lg:col-span-2">
+              <div className="card p-5">
+                <FamilySection studentId={id} />
+              </div>
+            </div>
           </div>
         )}
 
@@ -523,53 +519,7 @@ export default async function StudentDetailPage({
 
         {/* ── Documents Tab ─────────────────────────────────────────────────── */}
         {tab === "documents" && (
-          <div className="space-y-4">
-            <div className="grid gap-3">
-              {student.documents.map((doc) => {
-                const s = DOC_STATUS_STYLE[doc.status] || DOC_STATUS_STYLE.PENDING_REVIEW;
-                return (
-                  <div
-                    key={doc.id}
-                    className="card p-4 flex items-center gap-4"
-                    style={{ borderLeft: `3px solid ${s.border}`, padding: "14px 16px" }}
-                  >
-                    <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-base flex-shrink-0"
-                      style={{ background: s.bg, color: s.color }}
-                    >
-                      {s.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-                        {snakeToTitle(doc.documentType)}
-                      </p>
-                      <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-                        {doc.fileName} · Uploaded by {doc.uploadedBy.firstName} · {timeAgo(doc.createdAt)}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="badge" style={{ background: s.bg, color: s.color }}>
-                        {snakeToTitle(doc.status)}
-                      </span>
-                      <a
-                        href={doc.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn btn-secondary text-xs px-3 py-1.5"
-                      >
-                        View
-                      </a>
-                    </div>
-                  </div>
-                );
-              })}
-              {student.documents.length === 0 && (
-                <div className="card p-12 text-center">
-                  <p className="text-sm" style={{ color: "var(--text-muted)" }}>No documents uploaded yet</p>
-                </div>
-              )}
-            </div>
-          </div>
+          <DocumentsSection studentId={student.id} />
         )}
 
         {/* ── Applications Tab ──────────────────────────────────────────────── */}
@@ -613,6 +563,11 @@ export default async function StudentDetailPage({
               </div>
             )}
           </div>
+        )}
+
+        {/* ── Courses Tab ────────────────────────────────────────────────────── */}
+        {tab === "courses" && (
+          <CoursesSection studentId={student.id} />
         )}
 
         {/* ── Communications Tab ─────────────────────────────────────────────── */}

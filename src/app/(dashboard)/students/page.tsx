@@ -129,9 +129,11 @@ export default async function StudentsPage({
         </form>
       </div>
 
-      {/* Table */}
+      {/* Mobile Cards / Desktop Table */}
       <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-        <div className="overflow-x-auto">
+
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="table-base">
             <thead>
               <tr>
@@ -198,9 +200,7 @@ export default async function StudentsPage({
                     )}
                   </td>
                   <td>
-                    <span
-                      className={`badge priority-${s.priority.toLowerCase()} text-[10px]`}
-                    >
+                    <span className={`badge priority-${s.priority.toLowerCase()} text-[10px]`}>
                       {s.priority}
                     </span>
                   </td>
@@ -210,10 +210,7 @@ export default async function StudentsPage({
                     </span>
                   </td>
                   <td>
-                    <Link
-                      href={`/students/${s.id}`}
-                      className="btn btn-ghost text-xs px-3 py-1.5"
-                    >
+                    <Link href={`/students/${s.id}`} className="btn btn-ghost text-xs px-3 py-1.5">
                       View →
                     </Link>
                   </td>
@@ -221,6 +218,37 @@ export default async function StudentsPage({
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden divide-y" style={{ borderColor: "var(--border)" }}>
+          {students.map((s) => (
+            <Link key={s.id} href={`/students/${s.id}`} className="flex items-start gap-3 p-4 hover:bg-[var(--background)] transition-colors">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                style={{ background: "var(--primary)" }}
+              >
+                {s.firstName.charAt(0)}{s.lastName.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-medium text-sm truncate" style={{ color: "var(--text-primary)" }}>
+                    {s.firstName} {s.lastName}
+                  </p>
+                  <span className={`badge ${STAGE_COLORS[s.stage] || "badge-neutral"} text-[10px] flex-shrink-0`}>
+                    {STAGE_LABELS[s.stage] || s.stage}
+                  </span>
+                </div>
+                <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{s.phonePrimary} · {s.referenceNumber}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className={`badge priority-${s.priority.toLowerCase()} text-[10px]`}>{s.priority}</span>
+                  {s.preferredCountries.slice(0, 3).map((c) => (
+                    <span key={c} className="text-sm">{COUNTRY_FLAGS[c] || c}</span>
+                  ))}
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
 
         {students.length === 0 && (
