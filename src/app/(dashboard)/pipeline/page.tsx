@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { STAGE_LABELS, formatDate } from "@/lib/utils";
+import { STAGE_LABELS } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -54,11 +54,28 @@ export default async function PipelinePage() {
     },
   });
 
+  type StudentItem = (typeof students)[number];
+
   // Group by stage
-  const grouped: Record<string, typeof students> = {};
+  const grouped: Record<string, StudentItem[]> = {};
   for (const col of PIPELINE_COLUMNS) {
-    grouped[col.stage] = students.filter((s) => s.stage === col.stage);
+    grouped[col.stage] = students.filter((s: StudentItem) => s.stage === col.stage);
   }
+
+  // Pre-fetch terminal stage counts
+  const TERMINAL_STAGE_LIST = ["ON_HOLD", "WITHDRAWN", "VISA_REFUSED", "ENROLLED", "DEPARTED", "NOT_QUALIFIED"];
+  const terminalCounts = await Promise.all(
+    TERMINAL_STAGE_LIST.map((stage) =>
+      prisma.student.count({
+        where: {
+          isActive: true,
+          stage: stage as never,
+          ...(isAll ? {} : { assignedCounselorId: session.user.id }),
+        },
+      })
+    )
+  );
+  const terminalStats = TERMINAL_STAGE_LIST.map((stage, i) => ({ stage, count: terminalCounts[i] }));
 
   function daysInStage(updatedAt: Date): number {
     return Math.floor((Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24));
@@ -102,7 +119,7 @@ export default async function PipelinePage() {
 
                 {/* Cards */}
                 <div className="space-y-2 flex-1">
-                  {cards.map((student) => {
+                  {cards.map((student: StudentItem) => {
                     const days = daysInStage(student.updatedAt);
                     const slowAlert = days > 14;
 
@@ -143,7 +160,7 @@ export default async function PipelinePage() {
                           {/* Countries */}
                           {student.preferredCountries.length > 0 && (
                             <div className="flex gap-1 mt-2">
-                              {student.preferredCountries.slice(0, 3).map((c) => (
+                              {student.preferredCountries.slice(0, 3).map((c: string) => (
                                 <span key={c} className="text-base" title={c}>
                                   {COUNTRY_FLAGS[c] || c}
                                 </span>
@@ -185,15 +202,12 @@ export default async function PipelinePage() {
       <div className="card p-4">
         <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--text-secondary)" }}>Terminal / Other Stages</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {["ON_HOLD", "WITHDRAWN", "VISA_REFUSED", "ENROLLED", "DEPARTED", "NOT_QUALIFIED"].map(async (stage) => {
-            const count = await prisma.student.count({ where: { isActive: true, stage: stage as never, ...(isAll ? {} : { assignedCounselorId: session.user.id }) } });
-            return (
-              <div key={stage} className="text-center p-3 rounded-xl" style={{ background: "var(--background)" }}>
-                <p className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>{count}</p>
-                <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{STAGE_LABELS[stage] || stage}</p>
-              </div>
-            );
-          })}
+          {terminalStats.map(({ stage, count }) => (
+            <div key={stage} className="text-center p-3 rounded-xl" style={{ background: "var(--background)" }}>
+              <p className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>{count}</p>
+              <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{STAGE_LABELS[stage] || stage}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

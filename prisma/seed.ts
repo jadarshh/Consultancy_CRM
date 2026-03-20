@@ -1,7 +1,12 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
+import * as dotenv from "dotenv";
 
-const prisma = new PrismaClient();
+dotenv.config();
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL as string });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("🌱 Seeding EduFlow database...");
@@ -511,7 +516,7 @@ async function main() {
       direction: "OUTBOUND",
       subject: "Visa application update",
       summary: "Discussed visa timeline. Ahmed confirmed biometrics done. Awaiting decision.",
-      duration_minutes: 15,
+      durationMinutes: 15,
       outcome: "CONNECTED",
       followUpDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       loggedById: counselor1.id,
