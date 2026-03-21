@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -441,9 +441,8 @@ function UniversitiesContent() {
             </thead>
             <tbody>
               {filtered.map((uni) => (
-                <>
+                <React.Fragment key={uni.id}>
                   <tr
-                    key={uni.id}
                     className="cursor-pointer"
                     onClick={() => toggleExpand(uni.id)}
                   >
@@ -560,7 +559,7 @@ function UniversitiesContent() {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>
