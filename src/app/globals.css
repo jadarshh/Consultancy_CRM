@@ -129,7 +129,8 @@ body {
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -213,13 +214,14 @@ body {
 }
 
 .btn-primary {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
   color: #FFFFFF;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--primary-light);
-  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.3);
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+  box-shadow: 0 4px 14px rgba(30, 58, 95, 0.45);
+  filter: brightness(1.1);
 }
 
 .btn-secondary {
@@ -279,7 +281,7 @@ body {
 }
 
 .table-base tbody tr:hover {
-  background: #F8FAFC;
+  background: var(--primary-50);
 }
 
 .table-base tbody tr:last-child td {
@@ -311,6 +313,35 @@ body {
 .priority-high   { background: #FFF7ED; color: #C2410C; }
 .priority-urgent { background: #FEF2F2; color: #DC2626; }
 
+/* ─── Utility Classes ─────────────────────────────────────────────────────── */
+
+.gradient-primary {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.card-accent {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--accent);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-success {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--success);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ─── Animations ──────────────────────────────────────────────────────────── */
 
 @keyframes fadeIn {
@@ -331,6 +362,23 @@ body {
 .animate-fade-in { animation: fadeIn 200ms ease forwards; }
 .animate-slide-in { animation: slideIn 200ms ease forwards; }
 .animate-pulse-soft { animation: pulse-soft 2s ease infinite; }
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--background) 50%,
+    var(--border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 6px;
+}
 
 /* ─── Kanban ──────────────────────────────────────────────────────────────── */
 
@@ -371,7 +419,7 @@ body {
 @media (max-width: 768px) {
   body { font-size: 13px; }
 
-  .card { border-radius: 10px; }
+  .card { border-radius: 12px; }
 
   main { padding: 16px !important; }
 

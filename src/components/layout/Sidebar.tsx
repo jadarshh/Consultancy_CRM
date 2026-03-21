@@ -72,14 +72,20 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
-        <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+        <div
+          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{
+            background: "linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1))",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)",
+          }}
+        >
           <GraduationCap className="w-5 h-5 text-white" />
         </div>
         {!collapsed && (
           <div className="animate-fade-in">
-            <p className="font-bold text-white text-base leading-tight">EduFlow</p>
-            <p className="text-[10px]" style={{ color: "var(--sidebar-text-muted)" }}>
-              Consultancy CMS
+            <p className="font-bold text-white text-[15px] leading-tight tracking-tight">EduFlow</p>
+            <p className="text-[10px] font-medium tracking-wide uppercase" style={{ color: "rgba(255,255,255,0.45)" }}>
+              CRM Platform
             </p>
           </div>
         )}
@@ -108,31 +114,36 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className="px-2 py-3 border-t border-white/10 space-y-0.5">
-        <Link
-          href="/settings"
-          className={cn(
-            "sidebar-link flex items-center gap-3 px-3 py-2.5 text-sm font-medium",
-            pathname.startsWith("/settings") && "active",
-            collapsed && "justify-center"
-          )}
-          title={collapsed ? "Settings" : undefined}
-        >
-          <Settings className="w-4.5 h-4.5 flex-shrink-0" />
-          {!collapsed && <span>Settings</span>}
-        </Link>
+      <div
+        className="border-t border-white/10 p-2"
+        style={{ background: "rgba(0,0,0,0.1)" }}
+      >
+        <div className="space-y-0.5">
+          <Link
+            href="/settings"
+            className={cn(
+              "sidebar-link flex items-center gap-3 px-3 py-2.5 text-sm font-medium",
+              pathname.startsWith("/settings") && "active",
+              collapsed && "justify-center"
+            )}
+            title={collapsed ? "Settings" : undefined}
+          >
+            <Settings className="w-4.5 h-4.5 flex-shrink-0" />
+            {!collapsed && <span>Settings</span>}
+          </Link>
 
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          className={cn(
-            "sidebar-link w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium",
-            collapsed && "justify-center"
-          )}
-          title={collapsed ? "Sign Out" : undefined}
-        >
-          <LogOut className="w-4.5 h-4.5 flex-shrink-0" />
-          {!collapsed && <span>Sign Out</span>}
-        </button>
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className={cn(
+              "sidebar-link w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium",
+              collapsed && "justify-center"
+            )}
+            title={collapsed ? "Sign Out" : undefined}
+          >
+            <LogOut className="w-4.5 h-4.5 flex-shrink-0" />
+            {!collapsed && <span>Sign Out</span>}
+          </button>
+        </div>
       </div>
 
       {/* Collapse Toggle */}

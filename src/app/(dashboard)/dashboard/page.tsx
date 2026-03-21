@@ -265,27 +265,53 @@ export default async function DashboardPage({
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-              Good morning, {firstName}
-            </h1>
-            <span
-              className="badge badge-primary text-xs px-2 py-0.5 rounded-full font-semibold"
-              style={{ background: "var(--primary-50)", color: "var(--primary)" }}
-            >
-              {roleLabel}
-            </span>
+      {/* Hero Greeting */}
+      <div
+        className="rounded-2xl p-6 relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, var(--primary) 0%, #2A5298 50%, var(--accent) 100%)",
+          color: "white",
+        }}
+      >
+        {/* Decorative circles */}
+        <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full opacity-10" style={{ background: "white" }} />
+        <div className="absolute -bottom-8 right-16 w-28 h-28 rounded-full opacity-10" style={{ background: "white" }} />
+
+        <div className="relative z-10 flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-2xl font-bold text-white">
+                Good morning, {firstName} 👋
+              </h1>
+              <span
+                className="text-xs px-2.5 py-1 rounded-full font-semibold"
+                style={{ background: "rgba(255,255,255,0.2)", color: "white" }}
+              >
+                {roleLabel}
+              </span>
+            </div>
+            <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.75)" }}>
+              {today} — Here&apos;s your overview for today
+            </p>
           </div>
-          <p className="text-sm mt-0.5" style={{ color: "var(--text-secondary)" }}>
-            {today}
-          </p>
+          {/* Mini stats row inside hero */}
+          <div className="flex gap-6">
+            {[
+              { label: "Students", value: data.totalStudents },
+              { label: "Follow-ups", value: data.todayFollowUps },
+              { label: "Tasks", value: data.pendingTasks },
+            ].map(({ label, value }) => (
+              <div key={label} className="text-center">
+                <p className="text-2xl font-bold text-white">{value}</p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Quick Actions pill row */}
+      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Quick Actions</p>
       <div className="flex flex-wrap gap-2">
         <Link
           href="/students/new"
@@ -387,9 +413,10 @@ export default async function DashboardPage({
         <div className="lg:col-span-2 card p-6">
           <div className="flex items-center justify-between mb-1">
             <div>
-              <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
-                Pipeline Overview
-              </h2>
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 rounded-full" style={{ background: "var(--accent)" }} />
+                <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>Pipeline Overview</h2>
+              </div>
               <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
                 {data.totalPipelineStudents > 0
                   ? `${data.totalPipelineStudents} active student${data.totalPipelineStudents !== 1 ? "s" : ""} across pipeline`
@@ -418,7 +445,7 @@ export default async function DashboardPage({
                     className="h-2 rounded-full transition-all"
                     style={{
                       width: `${(_count.id / maxStageCount) * 100}%`,
-                      background: "var(--primary)",
+                      background: "linear-gradient(90deg, var(--primary), var(--accent))",
                     }}
                   />
                 </div>
@@ -444,9 +471,10 @@ export default async function DashboardPage({
         {/* My Tasks */}
         <div className="card p-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
-              My Tasks
-            </h2>
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 rounded-full" style={{ background: "var(--accent)" }} />
+              <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>My Tasks</h2>
+            </div>
             <Link
               href="/tasks"
               className="text-sm font-medium hover:underline"
@@ -507,9 +535,10 @@ export default async function DashboardPage({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
         <div className="card p-6">
-          <h2 className="font-semibold text-base mb-4" style={{ color: "var(--text-primary)" }}>
-            Recent Activity
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-4 rounded-full" style={{ background: "var(--accent)" }} />
+            <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>Recent Activity</h2>
+          </div>
           <div className="space-y-3">
             {data.recentActivity.map((log) => {
               const entityLabel =
@@ -565,9 +594,10 @@ export default async function DashboardPage({
         {/* Upcoming Follow-ups */}
         <div className="card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
-              Upcoming Follow-ups
-            </h2>
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-4 rounded-full" style={{ background: "var(--accent)" }} />
+              <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>Upcoming Follow-ups</h2>
+            </div>
             <Link
               href="/communication"
               className="text-sm font-medium hover:underline"
@@ -613,10 +643,9 @@ export default async function DashboardPage({
       {/* Course Enrollments — always shown */}
       <div className="card p-6">
         <div className="flex items-center gap-2 mb-1">
+          <div className="w-1 h-4 rounded-full" style={{ background: "var(--accent)" }} />
           <BookOpen className="w-5 h-5" style={{ color: "var(--primary)" }} />
-          <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>
-            Course Enrollments
-          </h2>
+          <h2 className="font-semibold text-base" style={{ color: "var(--text-primary)" }}>Course Enrollments</h2>
         </div>
         <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
           Students enrolled or needing enrollment in prep courses
@@ -627,18 +656,23 @@ export default async function DashboardPage({
             return (
               <div
                 key={courseType}
-                className="text-center p-3 rounded-xl"
-                style={{ background: "var(--background)" }}
+                className="text-center p-4 rounded-2xl border transition-all hover:shadow-md hover:-translate-y-0.5 cursor-default"
+                style={{
+                  background: counts.enrolled > 0
+                    ? "linear-gradient(135deg, var(--primary-50), var(--primary-100))"
+                    : "var(--background)",
+                  borderColor: counts.enrolled > 0 ? "var(--primary-100)" : "var(--border)",
+                }}
               >
-                <p className="text-xl font-bold" style={{ color: "var(--primary)" }}>
+                <p className="text-2xl font-bold" style={{ color: "var(--primary)" }}>
                   {counts.enrolled}
                 </p>
-                <p className="text-xs mt-0.5 font-medium" style={{ color: "var(--text-secondary)" }}>
+                <p className="text-[11px] mt-0.5 font-semibold" style={{ color: "var(--text-secondary)" }}>
                   {COURSE_TYPE_LABELS[courseType] || courseType}
                 </p>
                 {counts.needs > 0 && (
-                  <p className="text-xs mt-1" style={{ color: "var(--warning)" }}>
-                    {counts.needs} need{counts.needs !== 1 ? "s" : ""} enrollment
+                  <p className="text-[10px] mt-1 font-medium" style={{ color: "var(--warning)" }}>
+                    {counts.needs} pending
                   </p>
                 )}
               </div>

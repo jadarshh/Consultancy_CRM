@@ -54,11 +54,25 @@ export function StatCard({
   icon?: React.ReactNode;
   color?: "primary" | "success" | "warning" | "danger";
 }) {
+  const gradientMap = {
+    primary: "linear-gradient(135deg, var(--primary-50), var(--primary-100))",
+    success: "linear-gradient(135deg, #F0FDF4, #DCFCE7)",
+    warning: "linear-gradient(135deg, #FFFBEB, #FEF3C7)",
+    danger:  "linear-gradient(135deg, #FEF2F2, #FEE2E2)",
+  };
+
+  const accentMap = {
+    primary: "var(--primary)",
+    success: "var(--success)",
+    warning: "var(--warning)",
+    danger:  "var(--danger)",
+  };
+
   const colorMap = {
-    primary: { bg: "var(--primary-50)", icon: "var(--primary)" },
-    success: { bg: "var(--success-bg)", icon: "var(--success)" },
-    warning: { bg: "var(--warning-bg)", icon: "var(--warning)" },
-    danger: { bg: "var(--danger-bg)", icon: "var(--danger)" },
+    primary: { icon: "var(--primary)" },
+    success: { icon: "var(--success)" },
+    warning: { icon: "var(--warning)" },
+    danger:  { icon: "var(--danger)" },
   };
 
   const changeColors = {
@@ -68,11 +82,14 @@ export function StatCard({
   };
 
   return (
-    <div className="card p-5 flex items-start gap-4">
+    <div
+      className="card card-hover p-5 flex items-start gap-4"
+      style={{ borderTop: `2px solid ${accentMap[color]}` }}
+    >
       {icon && (
         <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: colorMap[color].bg, color: colorMap[color].icon }}
+          className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+          style={{ background: gradientMap[color], color: colorMap[color].icon }}
         >
           {icon}
         </div>
@@ -81,7 +98,7 @@ export function StatCard({
         <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
           {label}
         </p>
-        <p className="text-2xl font-bold mt-0.5" style={{ color: "var(--text-primary)" }}>
+        <p className="text-2xl font-bold tracking-tight mt-0.5" style={{ color: "var(--text-primary)" }}>
           {value}
         </p>
         {change && (

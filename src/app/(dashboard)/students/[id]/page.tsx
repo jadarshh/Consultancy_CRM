@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Phone, Mail, MessageSquare, MapPin, Flag, Edit, GraduationCap } from "lucide-react";
+import { ArrowLeft, Phone, Mail, MessageSquare, Flag, Edit, GraduationCap } from "lucide-react";
 import CommunicationSection from "@/components/students/CommunicationSection";
 import CoursesSection from "@/components/students/CoursesSection";
 import FamilySection from "@/components/students/FamilySection";
@@ -20,12 +20,6 @@ const COUNTRY_FLAGS: Record<string, string> = {
   NZ: "🇳🇿", IE: "🇮🇪", NL: "🇳🇱", FR: "🇫🇷", IN: "🇮🇳",
 };
 
-const DOC_STATUS_STYLE: Record<string, { bg: string; color: string; icon: string; border: string }> = {
-  VERIFIED:       { bg: "var(--success-bg)", color: "var(--success)", icon: "✓", border: "var(--success)" },
-  PENDING_REVIEW: { bg: "var(--warning-bg)", color: "var(--warning)", icon: "⏳", border: "var(--warning)" },
-  REJECTED:       { bg: "var(--danger-bg)", color: "var(--danger)", icon: "✗", border: "var(--danger)" },
-  EXPIRED:        { bg: "#F8FAFC", color: "var(--text-muted)", icon: "⚠", border: "var(--text-muted)" },
-};
 
 const COMM_ICONS: Record<string, string> = {
   PHONE_CALL: "📞", WHATSAPP: "💬", EMAIL: "✉️", SMS: "📱",
@@ -111,21 +105,12 @@ export default async function StudentDetailPage({
       {/* Student Header Card */}
       <div className="card p-6">
         <div className="flex flex-wrap items-start gap-5">
-          {/* Avatar */}
-          {student.photoUrl ? (
-            <img
-              src={student.photoUrl}
-              alt={`${student.firstName} ${student.lastName}`}
-              className="w-16 h-16 rounded-2xl object-cover flex-shrink-0"
-            />
-          ) : (
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold text-white flex-shrink-0"
-              style={{ background: "var(--primary)" }}
-            >
-              {student.firstName.charAt(0)}{student.lastName.charAt(0)}
-            </div>
-          )}
+          {/* Avatar with upload */}
+          <PhotoUpload
+            studentId={student.id}
+            currentPhotoUrl={student.photoUrl}
+            studentName={`${student.firstName} ${student.lastName}`}
+          />
 
           {/* Info */}
           <div className="flex-1 min-w-0">
