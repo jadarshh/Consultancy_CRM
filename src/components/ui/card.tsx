@@ -55,10 +55,10 @@ export function StatCard({
   color?: "primary" | "success" | "warning" | "danger";
 }) {
   const gradientMap = {
-    primary: "linear-gradient(135deg, var(--primary-50), var(--primary-100))",
-    success: "linear-gradient(135deg, #F0FDF4, #DCFCE7)",
-    warning: "linear-gradient(135deg, #FFFBEB, #FEF3C7)",
-    danger:  "linear-gradient(135deg, #FEF2F2, #FEE2E2)",
+    primary: "var(--primary-50)",
+    success: "#F0FDF4",
+    warning: "#FFFBEB",
+    danger:  "#FEF2F2",
   };
 
   const accentMap = {

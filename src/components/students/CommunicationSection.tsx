@@ -39,12 +39,12 @@ const TYPE_ICONS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  PHONE_CALL: "#1B4332",   // was #4A90D9 (blue)
+  PHONE_CALL: "#03045e",
   WHATSAPP: "#16A34A",
   EMAIL: "#7C3AED",
   SMS: "#64748B",
-  IN_PERSON: "#D4A853",    // was #E8913A (accent gold)
-  VIDEO_CALL: "#0D9488",   // was #0EA5E9 (teal)
+  IN_PERSON: "#D4A853",
+  VIDEO_CALL: "#0077b6",
   OTHER: "#94A3B8",
 };
 

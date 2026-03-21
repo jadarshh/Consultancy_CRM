@@ -32,26 +32,13 @@ export default function LoginPage() {
       <div
         className="hidden lg:flex flex-col w-[55%] p-12 relative overflow-hidden"
         style={{
-          background: "linear-gradient(145deg, #0A2D1F 0%, #1B4332 45%, #2D6A4F 100%)",
+          background: "#03045e",
         }}
       >
-        {/* Radial glow decorations */}
+        {/* Subtle dividing line */}
         <div
-          className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(212,168,83,0.15), transparent 70%)" }}
-        />
-        <div
-          className="absolute bottom-0 right-0 w-80 h-80 rounded-full pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(212,168,83,0.1), transparent 70%)" }}
-        />
-
-        {/* Grid texture */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            opacity: 0.035,
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h1v40H0zm39 0h1v40h-1zM0 0v1h40V0zm0 39v1h40v-1z' fill='%23ffffff'/%3E%3C/svg%3E")`,
-          }}
+          className="absolute top-0 right-0 w-px h-full pointer-events-none"
+          style={{ background: "rgba(255,255,255,0.06)" }}
         />
 
         {/* Logo */}
@@ -59,8 +46,8 @@ export default function LoginPage() {
           <div
             className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0"
             style={{
-              background: "linear-gradient(135deg, #D4A853, #B7791F)",
-              boxShadow: "0 4px 20px rgba(212,168,83,0.5)",
+              background: "#D4A853",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
             }}
           >
             <GraduationCap className="w-6 h-6 text-white" />
@@ -106,9 +93,9 @@ export default function LoginPage() {
                 </span>
               </div>
               {[
-                { label: "Applications Submitted", value: 48, color: "#60A5FA", pct: 72 },
+                { label: "Applications Submitted", value: 48, color: "rgba(255,255,255,0.85)", pct: 72 },
                 { label: "Visa Processing", value: 23, color: "#D4A853", pct: 45 },
-                { label: "Enrolled", value: 89, color: "#4ADE80", pct: 88 },
+                { label: "Enrolled", value: 89, color: "rgba(255,255,255,0.6)", pct: 88 },
               ].map(({ label, value, color, pct }) => (
                 <div key={label} className="mb-3">
                   <div className="flex justify-between mb-1">
@@ -167,10 +154,10 @@ export default function LoginPage() {
               style={{
                 bottom: "-20px",
                 left: "-10px",
-                background: "rgba(74,222,128,0.12)",
+                background: "rgba(255,255,255,0.07)",
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(74,222,128,0.25)",
+                border: "1px solid rgba(255,255,255,0.14)",
                 borderRadius: "16px",
                 padding: "14px 18px",
                 boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
@@ -179,9 +166,9 @@ export default function LoginPage() {
               <div className="flex items-center gap-2.5">
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: "rgba(74,222,128,0.2)" }}
+                  style={{ background: "rgba(255,255,255,0.1)" }}
                 >
-                  <TrendingUp className="w-4 h-4" style={{ color: "#4ADE80" }} />
+                  <TrendingUp className="w-4 h-4" style={{ color: "rgba(255,255,255,0.8)" }} />
                 </div>
                 <div>
                   <p className="text-white font-bold text-xl leading-none">94%</p>
@@ -236,12 +223,12 @@ export default function LoginPage() {
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #D4A853, #B7791F)" }}
+              style={{ background: "#D4A853" }}
             >
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="font-bold text-xl" style={{ color: "#1B4332" }}>
+              <p className="font-bold text-xl" style={{ color: "#03045e" }}>
                 EduFlow
               </p>
               <p className="text-[10px] uppercase tracking-wider" style={{ color: "#94A3B8" }}>
@@ -256,12 +243,12 @@ export default function LoginPage() {
             style={{
               background: "#FFFFFF",
               boxShadow:
-                "0 20px 60px rgba(27,67,50,0.1), 0 4px 16px rgba(27,67,50,0.06)",
-              border: "1px solid rgba(27,67,50,0.08)",
+                "0 20px 60px rgba(3,4,94,0.08), 0 4px 16px rgba(3,4,94,0.05)",
+              border: "1px solid rgba(3,4,94,0.07)",
             }}
           >
             <div className="mb-6">
-              <h2 className="text-2xl font-bold" style={{ color: "#1B4332" }}>
+              <h2 className="text-2xl font-bold" style={{ color: "#03045e" }}>
                 Welcome back
               </h2>
               <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
@@ -273,7 +260,7 @@ export default function LoginPage() {
               <div className="space-y-1.5">
                 <label
                   className="text-sm font-medium"
-                  style={{ color: "#1B4332" }}
+                  style={{ color: "#03045e" }}
                 >
                   Email address
                 </label>
@@ -291,7 +278,7 @@ export default function LoginPage() {
               <div className="space-y-1.5">
                 <label
                   className="text-sm font-medium"
-                  style={{ color: "#1B4332" }}
+                  style={{ color: "#03045e" }}
                 >
                   Password
                 </label>
@@ -330,11 +317,11 @@ export default function LoginPage() {
                 className="btn w-full font-semibold mt-2"
                 style={{
                   height: "44px",
-                  background: "linear-gradient(135deg, #1B4332, #2D6A4F)",
+                  background: "#03045e",
                   color: "white",
                   borderRadius: "10px",
                   fontSize: "15px",
-                  boxShadow: "0 4px 16px rgba(27,67,50,0.45)",
+                  boxShadow: "0 2px 8px rgba(3,4,94,0.3)",
                 }}
               >
                 {loading ? (
@@ -360,14 +347,14 @@ export default function LoginPage() {
             </form>
 
             {/* Feature list */}
-            <div className="mt-6 pt-6 border-t space-y-2" style={{ borderColor: "rgba(27,67,50,0.08)" }}>
+            <div className="mt-6 pt-6 border-t space-y-2" style={{ borderColor: "rgba(3,4,94,0.08)" }}>
               {[
                 "Student pipeline & visa tracking",
                 "Document management & checklists",
                 "Multi-role access control",
               ].map((feat) => (
                 <div key={feat} className="flex items-center gap-2">
-                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#1B4332" }} />
+                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#03045e" }} />
                   <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
                     {feat}
                   </span>
@@ -380,9 +367,9 @@ export default function LoginPage() {
           <div
             className="mt-4 p-3 rounded-xl text-xs flex items-center gap-2"
             style={{
-              background: "#ECFDF5",
-              color: "#1B4332",
-              border: "1px solid #D1FAE5",
+              background: "#EFF6FF",
+              color: "#03045e",
+              border: "1px solid #DBEAFE",
             }}
           >
             <span style={{ fontSize: "15px" }}>🔐</span>

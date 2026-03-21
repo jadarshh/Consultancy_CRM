@@ -267,17 +267,14 @@ export default async function DashboardPage({
 
       {/* Hero Greeting */}
       <div
-        className="rounded-2xl p-6 relative overflow-hidden"
+        className="rounded-2xl p-6"
         style={{
-          background: "linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%)",
+          background: "var(--primary)",
+          borderBottom: "3px solid var(--accent)",
           color: "white",
         }}
       >
-        {/* Decorative circles */}
-        <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full opacity-10" style={{ background: "white" }} />
-        <div className="absolute -bottom-8 right-16 w-28 h-28 rounded-full opacity-10" style={{ background: "white" }} />
-
-        <div className="relative z-10 flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-bold text-white">
@@ -445,7 +442,7 @@ export default async function DashboardPage({
                     className="h-2 rounded-full transition-all"
                     style={{
                       width: `${(_count.id / maxStageCount) * 100}%`,
-                      background: "linear-gradient(90deg, var(--primary), var(--accent))",
+                      background: "var(--primary)",
                     }}
                   />
                 </div>
@@ -656,12 +653,11 @@ export default async function DashboardPage({
             return (
               <div
                 key={courseType}
-                className="text-center p-4 rounded-2xl border transition-all hover:shadow-md hover:-translate-y-0.5 cursor-default"
+                className="text-center p-4 rounded-xl border transition-all hover:shadow-md hover:-translate-y-0.5 cursor-default"
                 style={{
-                  background: counts.enrolled > 0
-                    ? "linear-gradient(135deg, var(--primary-50), var(--primary-100))"
-                    : "var(--background)",
-                  borderColor: counts.enrolled > 0 ? "var(--primary-100)" : "var(--border)",
+                  background: "var(--surface)",
+                  borderColor: "var(--border)",
+                  borderLeft: counts.enrolled > 0 ? "3px solid var(--primary)" : undefined,
                 }}
               >
                 <p className="text-2xl font-bold" style={{ color: "var(--primary)" }}>
