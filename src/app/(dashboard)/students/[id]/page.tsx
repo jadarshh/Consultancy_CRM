@@ -211,7 +211,7 @@ export default async function StudentDetailPage({
                   ? {
                       background: "var(--primary)",
                       color: "#fff",
-                      boxShadow: "0 2px 8px rgba(3,4,94,0.3)",
+                      boxShadow: "0 2px 8px rgba(2,48,71,0.3)",
                     }
                   : {
                       background: "transparent",

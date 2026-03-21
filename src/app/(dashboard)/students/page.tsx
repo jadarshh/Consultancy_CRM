@@ -7,7 +7,7 @@ import { STAGE_LABELS, STAGE_COLORS, formatDate } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 const AVATAR_COLORS = [
-  "#03045e", "#023e8a", "#0077b6", "#0891B2",
+  "#023047", "#034a6e", "#0369a1", "#0891B2",
   "#7C3AED", "#C2410C", "#B45309", "#BE185D",
   "#1D4ED8", "#065F46",
 ];

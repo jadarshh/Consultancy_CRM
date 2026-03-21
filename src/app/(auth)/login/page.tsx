@@ -32,7 +32,7 @@ export default function LoginPage() {
       <div
         className="hidden lg:flex flex-col w-[55%] p-12 relative overflow-hidden"
         style={{
-          background: "#03045e",
+          background: "#023047",
         }}
       >
         {/* Subtle dividing line */}
@@ -53,7 +53,7 @@ export default function LoginPage() {
             <GraduationCap className="w-6 h-6 text-white" />
           </div>
           <div>
-            <p className="font-bold text-white text-xl tracking-tight">EduFlow</p>
+            <p className="font-bold text-white text-xl tracking-tight" style={{ color: "#FFFFFF" }}>EduFlow</p>
             <p
               className="text-[10px] uppercase tracking-widest font-medium"
               style={{ color: "rgba(255,255,255,0.45)" }}
@@ -228,7 +228,7 @@ export default function LoginPage() {
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="font-bold text-xl" style={{ color: "#03045e" }}>
+              <p className="font-bold text-xl" style={{ color: "#023047" }}>
                 EduFlow
               </p>
               <p className="text-[10px] uppercase tracking-wider" style={{ color: "#94A3B8" }}>
@@ -243,12 +243,12 @@ export default function LoginPage() {
             style={{
               background: "#FFFFFF",
               boxShadow:
-                "0 20px 60px rgba(3,4,94,0.08), 0 4px 16px rgba(3,4,94,0.05)",
-              border: "1px solid rgba(3,4,94,0.07)",
+                "0 20px 60px rgba(2,48,71,0.08), 0 4px 16px rgba(2,48,71,0.05)",
+              border: "1px solid rgba(2,48,71,0.07)",
             }}
           >
             <div className="mb-6">
-              <h2 className="text-2xl font-bold" style={{ color: "#03045e" }}>
+              <h2 className="text-2xl font-bold" style={{ color: "#023047" }}>
                 Welcome back
               </h2>
               <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
@@ -260,7 +260,7 @@ export default function LoginPage() {
               <div className="space-y-1.5">
                 <label
                   className="text-sm font-medium"
-                  style={{ color: "#03045e" }}
+                  style={{ color: "#023047" }}
                 >
                   Email address
                 </label>
@@ -278,7 +278,7 @@ export default function LoginPage() {
               <div className="space-y-1.5">
                 <label
                   className="text-sm font-medium"
-                  style={{ color: "#03045e" }}
+                  style={{ color: "#023047" }}
                 >
                   Password
                 </label>
@@ -317,11 +317,11 @@ export default function LoginPage() {
                 className="btn w-full font-semibold mt-2"
                 style={{
                   height: "44px",
-                  background: "#03045e",
+                  background: "#023047",
                   color: "white",
                   borderRadius: "10px",
                   fontSize: "15px",
-                  boxShadow: "0 2px 8px rgba(3,4,94,0.3)",
+                  boxShadow: "0 2px 8px rgba(2,48,71,0.3)",
                 }}
               >
                 {loading ? (
@@ -347,14 +347,14 @@ export default function LoginPage() {
             </form>
 
             {/* Feature list */}
-            <div className="mt-6 pt-6 border-t space-y-2" style={{ borderColor: "rgba(3,4,94,0.08)" }}>
+            <div className="mt-6 pt-6 border-t space-y-2" style={{ borderColor: "rgba(2,48,71,0.08)" }}>
               {[
                 "Student pipeline & visa tracking",
                 "Document management & checklists",
                 "Multi-role access control",
               ].map((feat) => (
                 <div key={feat} className="flex items-center gap-2">
-                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#03045e" }} />
+                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#023047" }} />
                   <span className="text-xs" style={{ color: "var(--text-secondary)" }}>
                     {feat}
                   </span>
@@ -368,7 +368,7 @@ export default function LoginPage() {
             className="mt-4 p-3 rounded-xl text-xs flex items-center gap-2"
             style={{
               background: "#EFF6FF",
-              color: "#03045e",
+              color: "#023047",
               border: "1px solid #DBEAFE",
             }}
           >

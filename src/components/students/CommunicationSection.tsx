@@ -39,7 +39,7 @@ const TYPE_ICONS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  PHONE_CALL: "#03045e",
+  PHONE_CALL: "#023047",
   WHATSAPP: "#16A34A",
   EMAIL: "#7C3AED",
   SMS: "#64748B",
