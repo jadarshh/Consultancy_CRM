@@ -8,6 +8,7 @@ import CoursesSection from "@/components/students/CoursesSection";
 import FamilySection from "@/components/students/FamilySection";
 import { StageChangeButton } from "@/components/students/StageChangeButton";
 import DocumentsSection from "@/components/students/DocumentsSection";
+import PhotoUpload from "@/components/students/PhotoUpload";
 import {
   STAGE_LABELS, STAGE_COLORS, formatDate, formatCurrency, snakeToTitle, timeAgo
 } from "@/lib/utils";
