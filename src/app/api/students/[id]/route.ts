@@ -81,6 +81,19 @@ export async function PATCH(
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await params;
+
+  // Only ADMIN/MANAGER can edit any student; COUNSELOR can only edit their assigned student
+  if (session.user.role === "COUNSELOR" || session.user.role === "RECEPTIONIST") {
+    const check = await prisma.student.findUnique({
+      where: { id },
+      select: { assignedCounselorId: true },
+    });
+    if (!check) return NextResponse.json({ error: "Student not found" }, { status: 404 });
+    if (session.user.role === "RECEPTIONIST" || check.assignedCounselorId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+  }
+
   const body = await req.json();
 
   // Sanitize: strip fields that should not be updated via PATCH

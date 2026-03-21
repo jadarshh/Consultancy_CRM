@@ -46,8 +46,25 @@ export async function POST(
   if (!file) return NextResponse.json({ error: "No file provided" }, { status: 400 });
   if (!documentType) return NextResponse.json({ error: "documentType is required" }, { status: 400 });
 
-  const originalName = file.name;
-  const filename = `${Date.now()}-${originalName}`;
+  const ALLOWED_DOC_TYPES = [
+    "application/pdf",
+    "image/jpeg", "image/png", "image/webp",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ];
+  const MAX_DOC_SIZE = 20 * 1024 * 1024; // 20 MB
+
+  if (!ALLOWED_DOC_TYPES.includes(file.type)) {
+    return NextResponse.json({ error: "Only PDF, images, or Word documents are allowed" }, { status: 400 });
+  }
+  if (file.size > MAX_DOC_SIZE) {
+    return NextResponse.json({ error: "File must be smaller than 20 MB" }, { status: 400 });
+  }
+
+  // Sanitize filename — strip path separators
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const originalName = safeName;
+  const filename = `${Date.now()}-${safeName}`;
   const uploadDir = path.join(process.cwd(), "public", "uploads", id);
   const filePath = path.join(uploadDir, filename);
 

@@ -21,8 +21,18 @@ export async function POST(
 
   if (!photo) return NextResponse.json({ error: "No photo provided" }, { status: 400 });
 
+  const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+  const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5 MB
+
+  if (!ALLOWED_IMAGE_TYPES.includes(photo.type)) {
+    return NextResponse.json({ error: "Only JPEG, PNG, WebP, or GIF images are allowed" }, { status: 400 });
+  }
+  if (photo.size > MAX_PHOTO_SIZE) {
+    return NextResponse.json({ error: "Photo must be smaller than 5 MB" }, { status: 400 });
+  }
+
   const originalName = photo.name;
-  const ext = path.extname(originalName) || ".jpg";
+  const ext = path.extname(originalName).toLowerCase() || ".jpg";
   const timestamp = Date.now();
   const filename = `photo-${timestamp}${ext}`;
   const uploadDir = path.join(process.cwd(), "public", "uploads", id);

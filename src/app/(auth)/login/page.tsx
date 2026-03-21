@@ -363,21 +363,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Demo credentials */}
-          <div
-            className="mt-4 p-3 rounded-xl text-xs flex items-center gap-2"
-            style={{
-              background: "#EFF6FF",
-              color: "#023047",
-              border: "1px solid #DBEAFE",
-            }}
-          >
-            <span style={{ fontSize: "15px" }}>🔐</span>
-            <div>
-              <span className="font-semibold">Demo: </span>
-              <span>admin@eduflow.com · Admin@123</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
