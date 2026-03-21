@@ -114,7 +114,7 @@ export function Topbar() {
                 </p>
               </div>
               <Link
-                href="/settings/profile"
+                href="/settings"
                 className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-[var(--background)] transition-colors"
                 style={{ color: "var(--text-secondary)" }}
                 onClick={() => setMenuOpen(false)}

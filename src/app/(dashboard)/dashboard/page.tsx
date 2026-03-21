@@ -319,7 +319,7 @@ export default async function DashboardPage({
           Add Student
         </Link>
         <Link
-          href="/communication/new"
+          href="/communication"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90 hover:scale-[1.02]"
           style={{ background: "var(--accent)", color: "#fff" }}
         >
@@ -327,7 +327,7 @@ export default async function DashboardPage({
           Log Communication
         </Link>
         <Link
-          href="/tasks/new"
+          href="/tasks"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90 hover:scale-[1.02]"
           style={{ background: "var(--success)", color: "#fff" }}
         >

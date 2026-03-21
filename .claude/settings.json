@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls /home/siri/Desktop/demo_prj/src/app/\\\\\\(dashboard\\\\\\)/settings/)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
