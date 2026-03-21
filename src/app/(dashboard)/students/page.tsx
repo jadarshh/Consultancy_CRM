@@ -1,10 +1,22 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import Link from "next/link";
-import { Search, Plus, Filter } from "lucide-react";
+import { Search, Plus, Filter, Users } from "lucide-react";
 import { STAGE_LABELS, STAGE_COLORS, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+
+const AVATAR_COLORS = [
+  "#1B4332", "#2D6A4F", "#0D9488", "#0891B2",
+  "#7C3AED", "#C2410C", "#B45309", "#BE185D",
+  "#1D4ED8", "#065F46",
+];
+
+function avatarColor(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
 
 const COUNTRY_FLAGS: Record<string, string> = {
   CA: "🇨🇦", GB: "🇬🇧", AU: "🇦🇺", US: "🇺🇸", DE: "🇩🇪",
@@ -87,6 +99,14 @@ export default async function StudentsPage({
 
       {/* Filters */}
       <div className="card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+            Filters
+          </p>
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            {total} result{total !== 1 ? "s" : ""}
+          </p>
+        </div>
         <form method="GET" className="flex flex-wrap gap-3 items-center">
           {/* Search */}
           <div className="relative flex-1 min-w-56">
@@ -149,22 +169,23 @@ export default async function StudentsPage({
             </thead>
             <tbody>
               {students.map((s) => (
-                <tr key={s.id}>
+                <tr key={s.id} className="cursor-pointer relative">
                   <td>
                     <div className="flex items-center gap-3">
                       <div
                         className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                        style={{ background: "var(--primary)" }}
+                        style={{ background: avatarColor(`${s.firstName}${s.lastName}`) }}
                       >
                         {s.firstName.charAt(0)}{s.lastName.charAt(0)}
                       </div>
                       <div>
                         <Link
                           href={`/students/${s.id}`}
-                          className="font-medium hover:underline text-sm"
+                          className="font-medium text-sm hover:underline relative"
                           style={{ color: "var(--text-primary)" }}
                         >
                           {s.firstName} {s.lastName}
+                          <span className="absolute inset-0 -inset-x-[999px]" aria-hidden="true" />
                         </Link>
                         <p className="text-xs" style={{ color: "var(--text-muted)" }}>
                           {s.referenceNumber}
@@ -210,9 +231,7 @@ export default async function StudentsPage({
                     </span>
                   </td>
                   <td>
-                    <Link href={`/students/${s.id}`} className="btn btn-ghost text-xs px-3 py-1.5">
-                      View →
-                    </Link>
+                    <span className="text-xs font-medium" style={{ color: "var(--accent)" }}>View →</span>
                   </td>
                 </tr>
               ))}
@@ -226,7 +245,7 @@ export default async function StudentsPage({
             <Link key={s.id} href={`/students/${s.id}`} className="flex items-start gap-3 p-4 hover:bg-[var(--background)] transition-colors">
               <div
                 className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                style={{ background: "var(--primary)" }}
+                style={{ background: avatarColor(`${s.firstName}${s.lastName}`) }}
               >
                 {s.firstName.charAt(0)}{s.lastName.charAt(0)}
               </div>
@@ -252,16 +271,29 @@ export default async function StudentsPage({
         </div>
 
         {students.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-lg font-medium" style={{ color: "var(--text-secondary)" }}>
-              No students found
-            </p>
-            <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
-              {q || stage ? "Try adjusting your filters" : "Add your first student to get started"}
+          <div className="text-center py-20 px-6">
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: "var(--primary-50)" }}
+            >
+              <Users className="w-8 h-8" style={{ color: "var(--primary)" }} />
+            </div>
+            <h3 className="text-base font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+              {q || stage ? "No students match your filters" : "No students yet"}
+            </h3>
+            <p className="text-sm mb-5" style={{ color: "var(--text-muted)" }}>
+              {q || stage
+                ? "Try clearing your search or choosing a different stage"
+                : "Add your first student to start managing their journey"}
             </p>
             {!q && !stage && (
-              <Link href="/students/new" className="btn btn-primary mt-4">
-                <Plus className="w-4 h-4" /> Add Student
+              <Link href="/students/new" className="btn btn-primary">
+                <Plus className="w-4 h-4" /> Add First Student
+              </Link>
+            )}
+            {(q || stage) && (
+              <Link href="/students" className="btn btn-secondary">
+                Clear Filters
               </Link>
             )}
           </div>

@@ -103,7 +103,7 @@ export default async function StudentDetailPage({
       </Link>
 
       {/* Student Header Card */}
-      <div className="card p-6">
+      <div className="card p-6" style={{ borderTop: "3px solid var(--primary)" }}>
         <div className="flex flex-wrap items-start gap-5">
           {/* Avatar with upload */}
           <PhotoUpload
@@ -192,17 +192,31 @@ export default async function StudentDetailPage({
       </div>
 
       {/* Tabs */}
-      <div className="border-b" style={{ borderColor: "var(--border)" }}>
-        <div className="flex gap-1 overflow-x-auto">
+      <div
+        className="card p-2"
+        style={{ background: "var(--background)" }}
+      >
+        {/* Tab Navigation */}
+        <div
+          className="flex gap-1 overflow-x-auto pb-1 -mb-px"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           {tabs.map(({ key, label }) => (
             <Link
               key={key}
               href={`/students/${id}?tab=${key}`}
-              className="px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors"
+              className="flex-shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all"
               style={
                 tab === key
-                  ? { borderColor: "var(--primary)", color: "var(--primary)" }
-                  : { borderColor: "transparent", color: "var(--text-secondary)" }
+                  ? {
+                      background: "var(--primary)",
+                      color: "#fff",
+                      boxShadow: "0 2px 8px rgba(27,67,50,0.3)",
+                    }
+                  : {
+                      background: "transparent",
+                      color: "var(--text-secondary)",
+                    }
               }
             >
               {label}

@@ -269,7 +269,7 @@ export default async function DashboardPage({
       <div
         className="rounded-2xl p-6 relative overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, var(--primary) 0%, #2A5298 50%, var(--accent) 100%)",
+          background: "linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 45%, var(--primary-light) 100%)",
           color: "white",
         }}
       >

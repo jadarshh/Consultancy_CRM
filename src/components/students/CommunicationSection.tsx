@@ -39,12 +39,12 @@ const TYPE_ICONS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  PHONE_CALL: "#4A90D9",
+  PHONE_CALL: "#1B4332",   // was #4A90D9 (blue)
   WHATSAPP: "#16A34A",
   EMAIL: "#7C3AED",
   SMS: "#64748B",
-  IN_PERSON: "#E8913A",
-  VIDEO_CALL: "#0EA5E9",
+  IN_PERSON: "#D4A853",    // was #E8913A (accent gold)
+  VIDEO_CALL: "#0D9488",   // was #0EA5E9 (teal)
   OTHER: "#94A3B8",
 };
 
@@ -257,7 +257,7 @@ function AddCommunicationForm({
   return (
     <div className="card p-5 animate-fade-in" style={{ borderLeft: "4px solid var(--accent)" }}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>
+        <h3 className="font-semibold text-sm" style={{ color: "var(--primary)" }}>
           Log Communication
         </h3>
         <button

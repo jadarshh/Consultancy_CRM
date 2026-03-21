@@ -1,22 +1,22 @@
 @import "tailwindcss";
 
-/* ─── EduFlow Design System — "Deep Ocean" Theme ──────────────────────────── */
+/* ─── EduFlow Design System — "Prestige Forest Green & Gold" Theme ─────────── */
 
 :root {
-  /* Brand Colors */
-  --primary: #1E3A5F;
-  --primary-light: #2A4A72;
-  --primary-dark: #152C47;
-  --primary-50: #EEF4FF;
-  --primary-100: #D8E8FF;
-  --accent: #4A90D9;
-  --accent-warm: #E8913A;
+  /* Brand Colors — Prestige Forest & Gold */
+  --primary: #1B4332;
+  --primary-light: #2D6A4F;
+  --primary-dark: #0A2D1F;
+  --primary-50: #ECFDF5;
+  --primary-100: #D1FAE5;
+  --accent: #D4A853;
+  --accent-warm: #B7791F;
 
   /* Neutrals */
-  --background: #F8FAFC;
+  --background: #F5F7F5;
   --surface: #FFFFFF;
-  --border: #E2E8F0;
-  --border-strong: #CBD5E1;
+  --border: #E2E8E0;
+  --border-strong: #C7D5C8;
 
   /* Text */
   --text-primary: #1A202C;
@@ -35,10 +35,10 @@
   --info-bg: #EFF6FF;
 
   /* Sidebar */
-  --sidebar-bg: #1E3A5F;
+  --sidebar-bg: #1B4332;
   --sidebar-hover: rgba(255,255,255,0.08);
-  --sidebar-active: rgba(255,255,255,0.15);
-  --sidebar-text: rgba(255,255,255,0.85);
+  --sidebar-active: rgba(212,168,83,0.22);
+  --sidebar-text: rgba(255,255,255,0.88);
   --sidebar-text-muted: rgba(255,255,255,0.5);
 
   /* Shadows */
@@ -60,6 +60,7 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
+
 
 /* ─── Base Styles ─────────────────────────────────────────────────────────── */
 
@@ -343,6 +344,27 @@ body {
 }
 
 /* ─── Animations ──────────────────────────────────────────────────────────── */
+
+/* ─── 3D Float Animations ─────────────────────────────────────────────────── */
+
+@keyframes float3d {
+  0%, 100% { transform: perspective(1000px) rotateY(-18deg) rotateX(8deg) translateY(0px); }
+  50%       { transform: perspective(1000px) rotateY(-15deg) rotateX(5deg) translateY(-12px); }
+}
+
+@keyframes float3d-alt {
+  0%, 100% { transform: perspective(800px) rotateY(12deg) rotateX(-5deg) translateY(0px); }
+  50%       { transform: perspective(800px) rotateY(10deg) rotateX(-8deg) translateY(-10px); }
+}
+
+@keyframes float3d-slow {
+  0%, 100% { transform: perspective(800px) rotateY(-10deg) rotateX(6deg) translateY(0px); }
+  50%       { transform: perspective(800px) rotateY(-12deg) rotateX(4deg) translateY(-8px); }
+}
+
+.animate-float3d       { animation: float3d     6s ease-in-out infinite; }
+.animate-float3d-alt   { animation: float3d-alt  5s ease-in-out infinite 1s; }
+.animate-float3d-slow  { animation: float3d-slow 7s ease-in-out infinite 2s; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
