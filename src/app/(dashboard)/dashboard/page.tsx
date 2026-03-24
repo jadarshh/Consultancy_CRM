@@ -244,6 +244,9 @@ export default async function DashboardPage({
   const data = await getDashboardData(session.user.id, role);
   const firstName = session.user.name?.split(" ")[0] || "there";
   const today = format(new Date(), "EEEE, MMMM do");
+  const hour = new Date().getHours();
+  const timeGreeting =
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   const maxStageCount = Math.max(...data.pipelineStats.map((s) => s._count.id), 1);
 
@@ -267,88 +270,87 @@ export default async function DashboardPage({
 
       {/* Hero Greeting */}
       <div
-        className="rounded-2xl p-6"
-        style={{
-          background: "var(--primary)",
-          borderBottom: "3px solid var(--accent)",
-          color: "white",
-        }}
+        className="rounded-2xl overflow-hidden"
+        style={{ background: "var(--primary)" }}
       >
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-bold text-white">
-                Good morning, {firstName} 👋
-              </h1>
-              <span
-                className="text-xs px-2.5 py-1 rounded-full font-semibold"
-                style={{ background: "rgba(255,255,255,0.2)", color: "white" }}
-              >
-                {roleLabel}
-              </span>
-            </div>
-            <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.75)" }}>
-              {today} — Here&apos;s your overview for today
-            </p>
-          </div>
-          {/* Mini stats row inside hero */}
-          <div className="flex gap-6">
-            {[
-              { label: "Students", value: data.totalStudents },
-              { label: "Follow-ups", value: data.todayFollowUps },
-              { label: "Tasks", value: data.pendingTasks },
-            ].map(({ label, value }) => (
-              <div key={label} className="text-center">
-                <p className="text-2xl font-bold text-white">{value}</p>
-                <p className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>{label}</p>
+        <div className="p-6">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "rgba(212,168,83,0.9)" }}>
+                {today}
+              </p>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h1 className="text-2xl font-bold text-white">
+                  {timeGreeting}, {firstName}
+                </h1>
+                <span
+                  className="text-xs px-2.5 py-1 rounded-full font-semibold"
+                  style={{ background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.9)" }}
+                >
+                  {roleLabel}
+                </span>
               </div>
-            ))}
+              <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.6)" }}>
+                Here&apos;s your overview for today
+              </p>
+            </div>
+            {/* Mini KPIs */}
+            <div className="flex gap-1">
+              {[
+                { label: "Students", value: data.totalStudents },
+                { label: "Follow-ups Today", value: data.todayFollowUps },
+                { label: "Open Tasks", value: data.pendingTasks },
+              ].map(({ label, value }) => (
+                <div
+                  key={label}
+                  className="text-center px-5 py-3 rounded-xl"
+                  style={{ background: "rgba(255,255,255,0.1)" }}
+                >
+                  <p className="text-2xl font-bold text-white">{value}</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>{label}</p>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
+
+        {/* Quick Actions strip */}
+        <div
+          className="px-6 py-3 flex flex-wrap gap-2"
+          style={{ background: "rgba(0,0,0,0.15)", borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <Link
+            href="/students/new"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-90"
+            style={{ background: "var(--accent)", color: "#fff" }}
+          >
+            <Users className="w-3.5 h-3.5" /> New Student
+          </Link>
+          <Link
+            href="/communication"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-90"
+            style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}
+          >
+            <Phone className="w-3.5 h-3.5" /> Log Communication
+          </Link>
+          <Link
+            href="/tasks"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-90"
+            style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}
+          >
+            <CheckSquare className="w-3.5 h-3.5" /> Add Task
+          </Link>
+          <Link
+            href="/pipeline"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-90"
+            style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}
+          >
+            <TrendingUp className="w-3.5 h-3.5" /> View Pipeline
+          </Link>
         </div>
       </div>
 
-      {/* Quick Actions pill row */}
-      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Quick Actions</p>
-      <div className="flex flex-wrap gap-2">
-        <Link
-          href="/students/new"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90 hover:scale-[1.02]"
-          style={{ background: "var(--primary)", color: "#fff" }}
-        >
-          <Users className="w-3.5 h-3.5" />
-          Add Student
-        </Link>
-        <Link
-          href="/communication"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90 hover:scale-[1.02]"
-          style={{ background: "var(--accent)", color: "#fff" }}
-        >
-          <Phone className="w-3.5 h-3.5" />
-          Log Communication
-        </Link>
-        <Link
-          href="/tasks"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all hover:opacity-90 hover:scale-[1.02]"
-          style={{ background: "var(--success)", color: "#fff" }}
-        >
-          <CheckSquare className="w-3.5 h-3.5" />
-          Add Task
-        </Link>
-        <Link
-          href="/pipeline"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-all hover:opacity-90 hover:scale-[1.02]"
-          style={{
-            background: "var(--surface)",
-            color: "var(--text-primary)",
-            borderColor: "var(--border)",
-          }}
-        >
-          <TrendingUp className="w-3.5 h-3.5" />
-          View Pipeline
-        </Link>
-      </div>
-
-      {/* Stat Cards Row 1 */}
+      {/* KPI Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Total Students"
@@ -376,32 +378,37 @@ export default async function DashboardPage({
         />
       </div>
 
-      {/* Stat Cards Row 2 — Journey Stage */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Visa Pending"
-          value={data.visaPendingCount.toLocaleString()}
-          icon={<Plane className="w-5 h-5" />}
-          color={data.visaPendingCount > 0 ? "warning" : "primary"}
-        />
-        <StatCard
-          label="Application Phase"
-          value={data.applicationPhaseCount.toLocaleString()}
-          icon={<TrendingUp className="w-5 h-5" />}
-          color="primary"
-        />
-        <StatCard
-          label="Visa Approved"
-          value={data.visaApprovedCount.toLocaleString()}
-          icon={<Award className="w-5 h-5" />}
-          color="success"
-        />
-        <StatCard
-          label="Enrolled"
-          value={data.enrolledCount.toLocaleString()}
-          icon={<Users className="w-5 h-5" />}
-          color="success"
-        />
+      {/* Journey Funnel */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>
+          Student Journey
+        </p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            label="Visa Pending"
+            value={data.visaPendingCount.toLocaleString()}
+            icon={<Plane className="w-5 h-5" />}
+            color={data.visaPendingCount > 0 ? "warning" : "primary"}
+          />
+          <StatCard
+            label="Application Phase"
+            value={data.applicationPhaseCount.toLocaleString()}
+            icon={<TrendingUp className="w-5 h-5" />}
+            color="primary"
+          />
+          <StatCard
+            label="Visa Approved"
+            value={data.visaApprovedCount.toLocaleString()}
+            icon={<Award className="w-5 h-5" />}
+            color="success"
+          />
+          <StatCard
+            label="Enrolled"
+            value={data.enrolledCount.toLocaleString()}
+            icon={<Users className="w-5 h-5" />}
+            color="success"
+          />
+        </div>
       </div>
 
       {/* Main Grid */}
@@ -429,31 +436,33 @@ export default async function DashboardPage({
             </Link>
           </div>
 
-          <div className="space-y-3 mt-5">
-            {data.pipelineStats.map(({ stage, _count }) => (
-              <div key={stage} className="flex items-center gap-3">
-                <div className="w-36 shrink-0">
-                  <span className={`badge ${STAGE_COLORS[stage] || "badge-neutral"} text-[10px]`}>
-                    {STAGE_LABELS[stage] || stage}
+          <div className="space-y-2.5 mt-5">
+            {data.pipelineStats.map(({ stage, _count }) => {
+              const pct = data.totalPipelineStudents > 0
+                ? Math.round((_count.id / data.totalPipelineStudents) * 100)
+                : 0;
+              return (
+                <div key={stage} className="flex items-center gap-3">
+                  <div className="w-40 shrink-0">
+                    <span className={`badge ${STAGE_COLORS[stage] || "badge-neutral"} text-[10px]`}>
+                      {STAGE_LABELS[stage] || stage}
+                    </span>
+                  </div>
+                  <div className="flex-1 h-1.5 rounded-full" style={{ background: "var(--border)" }}>
+                    <div
+                      className="h-1.5 rounded-full transition-all"
+                      style={{
+                        width: `${(_count.id / maxStageCount) * 100}%`,
+                        background: "var(--primary)",
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs font-semibold w-14 text-right tabular-nums" style={{ color: "var(--text-secondary)" }}>
+                    {_count.id} <span className="font-normal" style={{ color: "var(--text-muted)" }}>({pct}%)</span>
                   </span>
                 </div>
-                <div className="flex-1 h-2 rounded-full" style={{ background: "var(--border)" }}>
-                  <div
-                    className="h-2 rounded-full transition-all"
-                    style={{
-                      width: `${(_count.id / maxStageCount) * 100}%`,
-                      background: "var(--primary)",
-                    }}
-                  />
-                </div>
-                <span
-                  className="text-sm font-semibold w-6 text-right"
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {_count.id}
-                </span>
-              </div>
-            ))}
+              );
+            })}
             {data.pipelineStats.length === 0 && (
               <p className="text-sm text-center py-6" style={{ color: "var(--text-muted)" }}>
                 No active students yet.{" "}
